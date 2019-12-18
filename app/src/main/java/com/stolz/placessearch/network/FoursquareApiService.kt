@@ -1,12 +1,13 @@
 package com.stolz.placessearch.network
 
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.stolz.placessearch.SEATTLE_LATITUDE
 import com.stolz.placessearch.SEATTLE_LONGITUDE
 import com.stolz.placessearch.Utils
-import com.stolz.placessearch.model.Object
-import retrofit2.Call
+import com.stolz.placessearch.model.places.Object
+import kotlinx.coroutines.Deferred
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
@@ -26,12 +27,26 @@ private val moshi = Moshi.Builder()
 
 private val retrofit = Retrofit.Builder()
     .addConverterFactory(MoshiConverterFactory.create(moshi))
+    .addCallAdapterFactory(CoroutineCallAdapterFactory())
     .baseUrl(BASE_URL)
     .build()
 
 interface FoursquareApiService {
 
     @GET("venues/suggestcompletion")
+    fun getTypeaheadResults(
+        @Query("client_id") clientId: String = CLIENT_ID,
+        @Query("client_secret") clientSecret: String = CLIENT_SECRET,
+        @Query("ll") latLng: String = Utils.generateStringFromLatLng(
+            SEATTLE_LATITUDE,
+            SEATTLE_LONGITUDE
+        ),
+        @Query("limit") limit: String = FOURSQUARE_DEFAULT_LIMIT.toString(),
+        @Query("query") query: String,
+        @Query("v") timestamp: String = Utils.generateDateString()
+    ): Deferred<com.stolz.placessearch.model.typeahead.Object>
+
+    @GET("venues/search")
     fun getPlaces(
         @Query("client_id") clientId: String = CLIENT_ID,
         @Query("client_secret") clientSecret: String = CLIENT_SECRET,
@@ -42,7 +57,7 @@ interface FoursquareApiService {
         @Query("limit") limit: String = FOURSQUARE_DEFAULT_LIMIT.toString(),
         @Query("query") query: String,
         @Query("v") timestamp: String = Utils.generateDateString()
-    ): Call<Object>
+    ): Deferred<Object>
 }
 
 object FoursquareApi {

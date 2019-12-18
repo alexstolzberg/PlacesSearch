@@ -26,6 +26,8 @@ class SearchFragment : Fragment() {
 
         binding.viewModel = searchViewModel
 
+        binding.searchResultsList.adapter = SearchResultsAdapter()
+
         binding.fab.setOnClickListener { view ->
             view.findNavController().navigate(SearchFragmentDirections.actionSearchFragmentToMapFragment())
         }

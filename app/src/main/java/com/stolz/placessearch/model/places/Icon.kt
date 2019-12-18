@@ -1,4 +1,4 @@
-package com.stolz.placessearch.model
+package com.stolz.placessearch.model.places
 
 import com.squareup.moshi.JsonClass
 
