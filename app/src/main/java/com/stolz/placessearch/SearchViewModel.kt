@@ -25,15 +25,10 @@ class SearchViewModel : ViewModel() {
     val status: LiveData<SearchStatus>
         get() = _status
 
-    private val _venueImgUrl = MutableLiveData<String>()
-    val venueImgUrl: LiveData<String>
-        get() = _venueImgUrl
-
     // The list of places returned from the query
     private val _places = MutableLiveData<Set<Place>>()
     val places: LiveData<Set<Place>>
         get() = _places
-
 
     private var searchJob = Job()
     private val searchScope = CoroutineScope(searchJob + Dispatchers.Main)
