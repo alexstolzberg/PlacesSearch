@@ -17,16 +17,29 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/search_results_list"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:listData="@{viewModel.places}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:listData="@{viewModel.places}"
             tools:itemCount="16"
             tools:listitem="@layout/search_result_item" />
+
+        <ImageView
+            android:id="@+id/status_icon"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:contentDescription="Status Icon"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:searchStatus="@{viewModel.status}"
+            tools:ignore="HardcodedText" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"

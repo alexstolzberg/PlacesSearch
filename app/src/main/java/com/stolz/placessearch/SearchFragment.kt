@@ -8,6 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.stolz.placessearch.databinding.FragmentSearchBinding
 
 class SearchFragment : Fragment() {

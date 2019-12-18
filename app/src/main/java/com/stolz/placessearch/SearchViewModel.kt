@@ -18,10 +18,11 @@ private val TAG = SearchViewModel::class.java.simpleName
 
 class SearchViewModel : ViewModel() {
 
-    // The internal MutableLiveData String that stores the most recent response
+    enum class SearchStatus { LOADING, ERROR, DONE }
+
     private val _status =
-        MutableLiveData<String>() // TODO: Change livedata to match the list of objects
-    val status: LiveData<String>
+        MutableLiveData<SearchStatus>()
+    val status: LiveData<SearchStatus>
         get() = _status
 
     private val _venueImgUrl = MutableLiveData<String>()
@@ -29,8 +30,8 @@ class SearchViewModel : ViewModel() {
         get() = _venueImgUrl
 
     // The list of places returned from the query
-    private val _places = MutableLiveData<List<Place>>()
-    val places: LiveData<List<Place>>
+    private val _places = MutableLiveData<Set<Place>>()
+    val places: LiveData<Set<Place>>
         get() = _places
 
 
@@ -66,12 +67,16 @@ class SearchViewModel : ViewModel() {
             val searchPlacesDeferred =
                 FoursquareApi.retrofitService.getPlaces(query = query)
             try {
+                _status.value = SearchStatus.LOADING
                 val result = searchPlacesDeferred.await()
+                _status.value = SearchStatus.DONE
                 val venues = result.response.venues
                 Log.v(TAG, "Places Search Successful - ${venues.size} venues retrieved")
                 _places.value = extractPlacesFromVenues(venues)
             } catch (t: Throwable) {
                 Log.e(TAG, "Places Search Successful - ${t.message}")
+                _status.value = SearchStatus.ERROR
+                _places.value = HashSet()
             }
         }
     }
@@ -80,12 +85,11 @@ class SearchViewModel : ViewModel() {
      * This method takes the Venues model object and extracts places from it to return to the caller
      *
      * @param venues The model object to extract results from
-     * @return A List of place results
+     * @return A Set of place results -- a Set is used to filter out duplicates automatically
      */
     // TODO: SEE IF THERE IS A WAY TO EASILY MAP THE OBJECTS
-    // TODO: USE A SET AND NOT A LIST???
-    private fun extractPlacesFromVenues(venues: List<Venue>): List<Place> {
-        val places = ArrayList<Place>()
+    private fun extractPlacesFromVenues(venues: List<Venue>): Set<Place> {
+        val places = HashSet<Place>()
         for (venue in venues) {
             // Check the database to see if the current place has already been favorited
             // TODO: FAVORITES FEATURE
