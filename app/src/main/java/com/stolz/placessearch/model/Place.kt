@@ -4,24 +4,27 @@ import android.os.Parcel
 import android.os.Parcelable
 import com.google.android.gms.maps.model.LatLng
 
-class Place(val id: String,
-            val name: String,
-            val category: String,
-            val address: String,
-            val location: LatLng,
-            val distanceToCenter: Double,
-            val iconUrl: String = "",
-            var isFavorite: Boolean = false) : Parcelable {
+class Place(
+    val id: String?,
+    val name: String?,
+    val category: String?,
+    val address: String?,
+    val location: LatLng?,
+    val distanceToCenter: Double,
+    val iconUrl: String? = "",
+    var isFavorite: Boolean = false
+) : Parcelable {
 
     private constructor(parcel: Parcel) : this(
-            parcel.readString(),
-            parcel.readString(),
-            parcel.readString(),
-            parcel.readString(),
-            parcel.readParcelable(LatLng::class.java.classLoader),
-            parcel.readDouble(),
-            parcel.readString(),
-            parcel.readByte() != 0.toByte())
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readString(),
+        parcel.readParcelable(LatLng::class.java.classLoader),
+        parcel.readDouble(),
+        parcel.readString(),
+        parcel.readByte() != 0.toByte()
+    )
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(id)
