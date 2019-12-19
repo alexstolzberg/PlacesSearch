@@ -1,9 +1,12 @@
 package com.stolz.placessearch
 
 import android.app.Activity
+import android.content.res.Resources
+import android.util.DisplayMetrics
 import android.view.inputmethod.InputMethodManager
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.roundToInt
 
 object Utils {
     /**
@@ -32,5 +35,14 @@ object Utils {
         val inputMethodManager =
             activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(activity.currentFocus?.windowToken, 0)
+    }
+
+    /**
+     * A helper function to convert pixels to dp
+     */
+    @JvmStatic
+    fun pxToDp(resources: Resources, px: Int): Int {
+        val displayMetrics = resources.displayMetrics
+        return (px / (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT)).roundToInt()
     }
 }

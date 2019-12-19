@@ -28,6 +28,11 @@
     <fragment
         android:id="@+id/detailFragment"
         android:name="com.stolz.placessearch.DetailFragment"
-        android:label="fragment_detail"
-        tools:layout="@layout/fragment_detail" />
+        android:label=""
+        tools:layout="@layout/fragment_detail">
+
+        <argument
+            android:name="place"
+            app:argType="com.stolz.placessearch.model.Place" />
+    </fragment>
 </navigation>

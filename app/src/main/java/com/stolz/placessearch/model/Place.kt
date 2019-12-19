@@ -6,7 +6,7 @@ import com.google.android.gms.maps.model.LatLng
 
 class Place(
     val id: String?,
-    val name: String?,
+    val name: String,
     val category: String?,
     val address: String?,
     val location: LatLng?,

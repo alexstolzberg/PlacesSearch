@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -28,6 +29,9 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClic
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false)
         binding.lifecycleOwner = this
+
+        (activity as AppCompatActivity).supportActionBar?.show()
+
 
         binding.viewModel = searchViewModel
 
@@ -67,6 +71,6 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClic
 
     override fun onPlaceClicked(clickedPlace: Place) {
         view?.findNavController()
-            ?.navigate(SearchFragmentDirections.actionSearchFragmentToDetailFragment())
+            ?.navigate(SearchFragmentDirections.actionSearchFragmentToDetailFragment(clickedPlace))
     }
 }
