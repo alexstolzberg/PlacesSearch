@@ -81,6 +81,7 @@ class SearchViewModel : ViewModel() {
     }
 
     fun getPlaces(query: String) {
+        _typeaheadResults.value = HashSet()
         Log.v(TAG, "Getting places for query: \"${query}\"")
         searchScope.launch {
             val searchPlacesDeferred = FoursquareApi.retrofitService.getPlaces(query = query)

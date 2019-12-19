@@ -11,8 +11,9 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.stolz.placessearch.databinding.FragmentSearchBinding
+import com.stolz.placessearch.model.Place
 
-class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener {
+class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClickedListener {
 
     private lateinit var binding: FragmentSearchBinding
 
@@ -48,9 +49,8 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener {
         binding.typeaheadResultsList.addItemDecoration(
             DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
         )
-        binding.searchResultsList.adapter = SearchResultsAdapter()
+        binding.searchResultsList.adapter = SearchResultsAdapter(this)
 
-        // TODO: HIDE FAB UNTIL RESULTS ARE IN
         binding.fab.setOnClickListener { view ->
             view.findNavController()
                 .navigate(SearchFragmentDirections.actionSearchFragmentToMapFragment())
@@ -63,5 +63,10 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener {
         searchViewModel.queryUpdated(clickedSuggestion)
         binding.searchBar.setQuery(clickedSuggestion, true)
         binding.typeaheadResultsList.visibility = View.GONE
+    }
+
+    override fun onPlaceClicked(clickedPlace: Place) {
+        view?.findNavController()
+            ?.navigate(SearchFragmentDirections.actionSearchFragmentToDetailFragment())
     }
 }

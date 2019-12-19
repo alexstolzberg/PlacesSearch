@@ -1,10 +1,12 @@
 package com.stolz.placessearch
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +14,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.stolz.placessearch.model.Place
 
-class SearchResultsAdapter : ListAdapter<Place, SearchResultsAdapter.ViewHolder>(DiffCallback) {
+private val TAG = SearchResultsAdapter::class.java.simpleName
+
+class SearchResultsAdapter(private val listener: PlaceClickedListener) :
+    ListAdapter<Place, SearchResultsAdapter.ViewHolder>(DiffCallback) {
 
     companion object DiffCallback : DiffUtil.ItemCallback<Place>() {
         override fun areItemsTheSame(oldItem: Place, newItem: Place): Boolean {
@@ -36,6 +41,13 @@ class SearchResultsAdapter : ListAdapter<Place, SearchResultsAdapter.ViewHolder>
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val place = getItem(position)
+
+        holder.rowLayout.setOnClickListener {
+            // TODO: IS THERE A BETTER WAY TO SEND THIS INFORMATION?
+            Log.d(TAG, "Place result clicked: ${holder.name}")
+            listener.onPlaceClicked(place)
+        }
+
         holder.name.text = place.name
         Glide.with(holder.icon.context)
             .load(place.iconUrl)
@@ -69,6 +81,7 @@ class SearchResultsAdapter : ListAdapter<Place, SearchResultsAdapter.ViewHolder>
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val rowLayout: CardView = itemView.findViewById(R.id.row_layout)
         val icon: ImageView = itemView.findViewById(R.id.icon)
         val name: TextView = itemView.findViewById(R.id.name)
         val category: TextView = itemView.findViewById(R.id.category)
