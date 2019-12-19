@@ -33,6 +33,10 @@ private val retrofit = Retrofit.Builder()
 
 interface FoursquareApiService {
 
+    companion object{
+        const val FOURSQUARE_MIN_QUERY_LENGTH = 3
+    }
+
     @GET("venues/suggestcompletion")
     fun getTypeaheadResults(
         @Query("client_id") clientId: String = CLIENT_ID,

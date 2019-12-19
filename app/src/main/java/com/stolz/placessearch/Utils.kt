@@ -1,5 +1,7 @@
 package com.stolz.placessearch
 
+import android.app.Activity
+import android.view.inputmethod.InputMethodManager
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -20,5 +22,15 @@ object Utils {
     @JvmStatic
     fun generateStringFromLatLng(lat: Double, lng: Double): String {
         return "$lat,$lng"
+    }
+
+    @JvmStatic
+    fun hideSoftKeyboard(activity: Activity?) {
+        if (activity == null) {
+            return
+        }
+        val inputMethodManager =
+            activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(activity.currentFocus?.windowToken, 0)
     }
 }

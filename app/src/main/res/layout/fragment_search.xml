@@ -15,19 +15,47 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/search_bar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/typeahead_results_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/card_background"
+            android:maxHeight="300dp"
+            android:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/search_bar"
+            app:typeaheadData="@{viewModel.typeaheadResults}"
+            tools:itemCount="16"
+            tools:listitem="@layout/row_place_search_result" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/search_results_list"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:scrollbars="vertical"
+            android:visibility="gone"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:scrollbars="vertical"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:listData="@{viewModel.places}"
+            app:layout_constraintTop_toBottomOf="@+id/search_bar"
+            app:placeData="@{viewModel.places}"
             tools:itemCount="16"
-            tools:listitem="@layout/search_result_item" />
+            tools:listitem="@layout/row_place_search_result" />
 
         <ImageView
             android:id="@+id/status_icon"
@@ -50,6 +78,8 @@
             android:layout_margin="@dimen/fab_margin"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
+            android:visibility="gone"
+            app:fabStatus="@{viewModel.status}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@android:drawable/ic_dialog_map" />
