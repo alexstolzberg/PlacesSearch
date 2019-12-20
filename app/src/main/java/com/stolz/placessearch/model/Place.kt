@@ -5,11 +5,11 @@ import android.os.Parcelable
 import com.google.android.gms.maps.model.LatLng
 
 class Place(
-    val id: String?,
+    val id: String,
     val name: String,
     val category: String?,
     val address: String?,
-    val location: LatLng?,
+    val location: LatLng,
     val distanceToCenter: Double,
     val iconUrl: String? = "",
     var isFavorite: Boolean = false

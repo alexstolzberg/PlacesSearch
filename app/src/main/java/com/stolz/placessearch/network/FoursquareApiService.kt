@@ -11,11 +11,11 @@ import kotlinx.coroutines.Deferred
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 private const val BASE_URL = "https://api.foursquare.com/v2/"
-private const val FOURSQUARE_DEFAULT_LIMIT =
-    50 // TODO: Limited results to 50 per request -- add customization to this field
+private const val FOURSQUARE_DEFAULT_LIMIT = 50
 
 // TODO: MOVE THESE TO A MORE SECURE PLACE
 private const val CLIENT_ID = "WD3UQZ03SJ4VDZSDEWXBHPSOHZSNRGQIBAEY3Q0UGWPXXYJH"
@@ -33,7 +33,7 @@ private val retrofit = Retrofit.Builder()
 
 interface FoursquareApiService {
 
-    companion object{
+    companion object {
         const val FOURSQUARE_MIN_QUERY_LENGTH = 3
     }
 
@@ -62,6 +62,14 @@ interface FoursquareApiService {
         @Query("query") query: String,
         @Query("v") timestamp: String = Utils.generateDateString()
     ): Deferred<Object>
+
+    @GET("venues/{venueId}")
+    fun getVenueDetails(
+        @Path("venueId") venueId: String,
+        @Query("client_id") clientId: String = CLIENT_ID,
+        @Query("client_secret") clientSecret: String = CLIENT_SECRET,
+        @Query("v") timestamp: String = Utils.generateDateString()
+    ): Deferred<com.stolz.placessearch.model.venue_information.Object>
 }
 
 object FoursquareApi {
