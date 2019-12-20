@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="foursquare_client_id">WD3UQZ03SJ4VDZSDEWXBHPSOHZSNRGQIBAEY3Q0UGWPXXYJH</string>
+    <string name="foursquare_client_secret">L2NUD1USBGSCRLZF1WVA4PEE0VD2PPAR01RF3IJ5QB4BABCD</string>
+    <string name="googleMapsApiKey">AIzaSyDtOKOqWrTMcctBzkECJzwKPRXJt2LLClw</string>
+</resources>

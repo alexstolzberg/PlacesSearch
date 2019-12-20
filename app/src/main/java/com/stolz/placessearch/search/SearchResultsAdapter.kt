@@ -1,4 +1,4 @@
-package com.stolz.placessearch
+package com.stolz.placessearch.search
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.stolz.placessearch.R
 import com.stolz.placessearch.model.Place
 
 private val TAG = SearchResultsAdapter::class.java.simpleName

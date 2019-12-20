@@ -1,4 +1,4 @@
-package com.stolz.placessearch
+package com.stolz.placessearch.details
 
 
 import android.os.Bundle
@@ -13,6 +13,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.stolz.placessearch.R
+import com.stolz.placessearch.util.Utils
 import com.stolz.placessearch.databinding.FragmentDetailBinding
 import com.stolz.placessearch.model.places.Venue
 
@@ -28,7 +30,8 @@ class DetailFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_detail, container, false)
+        binding = DataBindingUtil.inflate(inflater,
+            R.layout.fragment_detail, container, false)
         binding.lifecycleOwner = this
 
         // TODO: Should we show and hide the action bar
@@ -67,7 +70,8 @@ class DetailFragment : Fragment() {
         // TODO: CLEAN THIS UP
         venue?.contact?.let { contactInfo ->
             if (contactInfo.phone != null && contactInfo.phone.isNotEmpty()) {
-                binding.contentDetails.phone.text = Utils.formatPhoneNumber(contactInfo.phone)
+                binding.contentDetails.phone.text =
+                    Utils.formatPhoneNumber(contactInfo.phone)
                 Linkify.addLinks(
                     binding.contentDetails.phone, Patterns.PHONE, "tel:",
                     Linkify.sPhoneNumberMatchFilter, Linkify.sPhoneNumberTransformFilter

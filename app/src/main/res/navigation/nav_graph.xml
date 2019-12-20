@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/searchFragment"
-        android:name="com.stolz.placessearch.SearchFragment"
+        android:name="com.stolz.placessearch.search.SearchFragment"
         android:label="Place Search"
         tools:layout="@layout/fragment_search">
         <action
@@ -22,12 +22,20 @@
     </fragment>
     <fragment
         android:id="@+id/mapFragment"
-        android:name="com.stolz.placessearch.MapFragment"
+        android:name="com.stolz.placessearch.map.MapFragment"
         android:label="Map"
-        tools:layout="@layout/fragment_map" />
+        tools:layout="@layout/fragment_map" >
+        <argument
+            android:name="places"
+            app:argType="com.stolz.placessearch.model.Place[]"
+            app:nullable="true" />
+        <action
+            android:id="@+id/action_mapFragment_to_detailFragment"
+            app:destination="@id/detailFragment" />
+    </fragment>
     <fragment
         android:id="@+id/detailFragment"
-        android:name="com.stolz.placessearch.DetailFragment"
+        android:name="com.stolz.placessearch.details.DetailFragment"
         android:label=""
         tools:layout="@layout/fragment_detail">
 

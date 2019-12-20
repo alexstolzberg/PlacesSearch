@@ -1,4 +1,4 @@
-package com.stolz.placessearch
+package com.stolz.placessearch.search
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -10,6 +10,7 @@ import com.stolz.placessearch.model.places.Venue
 import com.stolz.placessearch.model.typeahead.Minivenue
 import com.stolz.placessearch.network.FoursquareApi
 import com.stolz.placessearch.network.FoursquareApiService
+import com.stolz.placessearch.util.NUM_METERS_PER_MILE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -18,7 +19,7 @@ import java.text.DecimalFormat
 
 private val TAG = SearchViewModel::class.java.simpleName
 
-class SearchViewModel : ViewModel() {
+class SearchViewModel() : ViewModel() {
 
     enum class SearchStatus { LOADING, ERROR, DONE, EMPTY }
 
@@ -68,7 +69,8 @@ class SearchViewModel : ViewModel() {
         _status.value = SearchStatus.EMPTY
         searchScope.launch {
             val typeaheadResultsDeferred =
-                FoursquareApi.retrofitService.getTypeaheadResults(query = query)
+                FoursquareApi.retrofitService.getTypeaheadResults(
+                    query = query)
             try {
                 val result = typeaheadResultsDeferred.await()
                 val minivenues = result.response.minivenues
@@ -141,7 +143,6 @@ class SearchViewModel : ViewModel() {
             if (venue.categories.isNotEmpty()) {
                 val category = venue.categories[0]
                 categoryName = category.name
-                val categoryId = category.id // FIXME: REMOVE
 
                 if (category.icon != null) {
                     val prefix = category.icon.prefix

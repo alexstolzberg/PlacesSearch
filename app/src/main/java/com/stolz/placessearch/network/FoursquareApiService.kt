@@ -3,10 +3,10 @@ package com.stolz.placessearch.network
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import com.stolz.placessearch.SEATTLE_LATITUDE
-import com.stolz.placessearch.SEATTLE_LONGITUDE
-import com.stolz.placessearch.Utils
 import com.stolz.placessearch.model.places.Object
+import com.stolz.placessearch.util.SEATTLE_LATITUDE
+import com.stolz.placessearch.util.SEATTLE_LONGITUDE
+import com.stolz.placessearch.util.Utils
 import kotlinx.coroutines.Deferred
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory

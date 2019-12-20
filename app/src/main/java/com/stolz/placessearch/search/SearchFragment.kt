@@ -1,4 +1,4 @@
-package com.stolz.placessearch
+package com.stolz.placessearch.search
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,8 +11,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
+import com.stolz.placessearch.R
 import com.stolz.placessearch.databinding.FragmentSearchBinding
 import com.stolz.placessearch.model.Place
+import com.stolz.placessearch.util.Utils
 
 class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClickedListener {
 
@@ -27,11 +29,11 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClic
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false)
+        binding = DataBindingUtil.inflate(inflater,
+            R.layout.fragment_search, container, false)
         binding.lifecycleOwner = this
 
         (activity as AppCompatActivity).supportActionBar?.show()
-
 
         binding.viewModel = searchViewModel
 
@@ -49,7 +51,8 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClic
             }
         })
 
-        binding.typeaheadResultsList.adapter = TypeaheadResultsAdapter(this)
+        binding.typeaheadResultsList.adapter =
+            TypeaheadResultsAdapter(this)
         binding.typeaheadResultsList.addItemDecoration(
             DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
         )
@@ -57,7 +60,11 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClic
 
         binding.fab.setOnClickListener { view ->
             view.findNavController()
-                .navigate(SearchFragmentDirections.actionSearchFragmentToMapFragment())
+                .navigate(
+                    SearchFragmentDirections.actionSearchFragmentToMapFragment(
+                        searchViewModel.places.value?.toTypedArray()
+                    )
+                )
         }
 
         return binding.root
@@ -71,6 +78,14 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClic
 
     override fun onPlaceClicked(clickedPlace: Place) {
         view?.findNavController()
-            ?.navigate(SearchFragmentDirections.actionSearchFragmentToDetailFragment(clickedPlace))
+            ?.navigate(
+                SearchFragmentDirections.actionSearchFragmentToDetailFragment(
+                    clickedPlace
+                )
+            )
+    }
+
+    override fun onFavoriteClicked(clickedPlace: Place) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

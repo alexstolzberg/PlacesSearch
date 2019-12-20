@@ -1,4 +1,4 @@
-package com.stolz.placessearch
+package com.stolz.placessearch.search
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,6 +9,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.stolz.placessearch.R
 
 private val TAG = TypeaheadResultsAdapter::class.java.simpleName
 

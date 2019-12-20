@@ -1,4 +1,4 @@
-package com.stolz.placessearch
+package com.stolz.placessearch.util
 
 // Center coordinates for Seattle, Washington
 const val SEATTLE_LATITUDE = 47.6062

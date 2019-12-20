@@ -1,4 +1,4 @@
-package com.stolz.placessearch
+package com.stolz.placessearch.util
 
 import android.app.Activity
 import android.content.res.Resources

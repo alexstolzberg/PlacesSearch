@@ -2,13 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".DetailFragment">
+    tools:context=".details.DetailFragment">
 
     <data>
 
         <variable
             name="viewModel"
-            type="com.stolz.placessearch.DetailViewModel" />
+            type="com.stolz.placessearch.details.DetailViewModel" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

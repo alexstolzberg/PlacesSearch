@@ -1,4 +1,4 @@
-package com.stolz.placessearch
+package com.stolz.placessearch.details
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
