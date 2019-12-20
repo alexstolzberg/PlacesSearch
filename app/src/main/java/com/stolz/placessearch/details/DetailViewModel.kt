@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.stolz.placessearch.database.PlaceDao
 import com.stolz.placessearch.model.Place
 import com.stolz.placessearch.model.places.Venue
 import com.stolz.placessearch.network.FoursquareApi
@@ -16,7 +17,7 @@ import java.io.BufferedInputStream
 
 private val TAG = DetailViewModel::class.java.simpleName
 
-class DetailViewModel : ViewModel() {
+class DetailViewModel(private val favoritesDatabase: PlaceDao) : ViewModel() {
 
     // The detailed venue information
     private val _venueInformation = MutableLiveData<Venue>()
@@ -89,8 +90,19 @@ class DetailViewModel : ViewModel() {
         }
     }
 
-    fun favoriteToggled(place: Place) {
-        // TODO: IMPLEMENT
+    fun updateFavoriteForPlace(place: Place) {
+        detailsScope.launch {
+            withContext(Dispatchers.IO) {
+                val placeEntity = Place.toPlaceEntity(place)
+                val placeInDb = favoritesDatabase.getPlace(place.id)
+                if (placeInDb == null) {
+                    favoritesDatabase.insert(placeEntity)
+                } else {
+                    favoritesDatabase.updatePlace(placeEntity)
+
+                }
+            }
+        }
     }
 
     override fun onCleared() {

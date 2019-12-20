@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
+import com.stolz.placessearch.database.PlaceDao
 import com.stolz.placessearch.model.Place
 import com.stolz.placessearch.model.places.Venue
 import com.stolz.placessearch.model.typeahead.Minivenue
@@ -16,7 +17,7 @@ import java.text.DecimalFormat
 
 private val TAG = SearchViewModel::class.java.simpleName
 
-class SearchViewModel : ViewModel() {
+class SearchViewModel(private val favoritesDatabase: PlaceDao) : ViewModel() {
 
     enum class SearchStatus { LOADING, ERROR, DONE, EMPTY }
 
@@ -97,7 +98,7 @@ class SearchViewModel : ViewModel() {
 
         }
     }
-    
+
     private suspend fun fetchPlaces(query: String): Set<Place> {
         return withContext(Dispatchers.IO) {
             val searchPlacesDeferred = FoursquareApi.retrofitService.getPlaces(query = query)
@@ -109,6 +110,21 @@ class SearchViewModel : ViewModel() {
             } catch (t: Throwable) {
                 Log.e(TAG, "Places search failed - ${t.message}")
                 HashSet<Place>()
+            }
+        }
+    }
+
+    fun updateFavoriteForPlace(place: Place) {
+        searchScope.launch {
+            withContext(Dispatchers.IO) {
+                val placeEntity = Place.toPlaceEntity(place)
+                val placeInDb = favoritesDatabase.getPlace(place.id)
+                if (placeInDb == null) {
+                    favoritesDatabase.insert(placeEntity)
+                } else {
+                    favoritesDatabase.updatePlace(placeEntity)
+
+                }
             }
         }
     }
@@ -141,9 +157,7 @@ class SearchViewModel : ViewModel() {
         val places = HashSet<Place>()
         for (venue in venues) {
             // Check the database to see if the current place has already been favorited
-            // TODO: FAVORITES FEATURE
-            val isFavorite = false //isVenueFavorited(context, venue.getId())
-
+            val isFavorite = isVenueFavorited(venue.id)
             val id = venue.id
             val name = venue.name
             var categoryName = ""
@@ -184,6 +198,11 @@ class SearchViewModel : ViewModel() {
         }
 
         return places
+    }
+
+    private fun isVenueFavorited(venueId: String): Boolean {
+        val entity = favoritesDatabase.getPlace(venueId)
+        return entity != null
     }
 
     override fun onCleared() {

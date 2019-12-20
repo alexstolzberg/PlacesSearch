@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.stolz.placessearch.R
+import com.stolz.placessearch.database.FavoriteDatabase
 import com.stolz.placessearch.databinding.FragmentSearchBinding
 import com.stolz.placessearch.model.Place
 import com.stolz.placessearch.util.Utils
@@ -19,22 +20,27 @@ import com.stolz.placessearch.util.Utils
 class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClickedListener {
 
     private lateinit var binding: FragmentSearchBinding
-
-    private val searchViewModel: SearchViewModel by lazy {
-        ViewModelProviders.of(this).get(SearchViewModel::class.java)
-    }
+    private lateinit var searchViewModel: SearchViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater,
-            R.layout.fragment_search, container, false)
+        binding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.fragment_search, container, false
+        )
         binding.lifecycleOwner = this
 
         (activity as AppCompatActivity).supportActionBar?.show()
 
+        // Initialize ViewModel
+        val context = requireNotNull(context)
+        val favoritesDatabase = FavoriteDatabase.getInstance(context).placeDao()
+        val viewModelFactory = SearchViewModelFactory(favoritesDatabase)
+        searchViewModel =
+            ViewModelProviders.of(this, viewModelFactory).get(SearchViewModel::class.java)
         binding.viewModel = searchViewModel
 
         binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -86,6 +92,6 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClic
     }
 
     override fun onFavoriteClicked(clickedPlace: Place) {
-
+        searchViewModel.updateFavoriteForPlace(clickedPlace)
     }
 }

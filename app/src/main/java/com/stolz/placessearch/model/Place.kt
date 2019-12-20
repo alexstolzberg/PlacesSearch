@@ -3,6 +3,7 @@ package com.stolz.placessearch.model
 import android.os.Parcel
 import android.os.Parcelable
 import com.google.android.gms.maps.model.LatLng
+import com.stolz.placessearch.database.PlaceEntity
 
 class Place(
     val id: String,
@@ -39,12 +40,27 @@ class Place(
 
     override fun describeContents() = 0
 
+
+
     companion object {
         @JvmField
         val CREATOR = object : Parcelable.Creator<Place> {
             override fun createFromParcel(parcel: Parcel) = Place(parcel)
 
             override fun newArray(size: Int): Array<Place?> = arrayOfNulls(size)
+        }
+
+        @JvmStatic
+        fun toPlaceEntity(place: Place) : PlaceEntity {
+            val placeEntity = PlaceEntity()
+            placeEntity.id = place.id
+            placeEntity.name = place.name
+            placeEntity.category = place.category!! // FIXME: ???
+            placeEntity.latitude = place.location.latitude
+            placeEntity.longitude = place.location.longitude
+            placeEntity.distanceToCenter = place.distanceToCenter
+            placeEntity.isFavorite = place.isFavorite
+            return placeEntity
         }
     }
 }

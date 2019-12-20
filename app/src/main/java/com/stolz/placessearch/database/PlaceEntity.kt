@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "favorites_table")
 data class PlaceEntity(
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     @ColumnInfo(name = "id")
     var id: String = "",
 

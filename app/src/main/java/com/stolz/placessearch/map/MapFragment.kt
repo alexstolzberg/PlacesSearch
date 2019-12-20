@@ -16,7 +16,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.stolz.placessearch.*
+import com.stolz.placessearch.R
 import com.stolz.placessearch.databinding.FragmentMapBinding
 import com.stolz.placessearch.model.Place
 import com.stolz.placessearch.util.SEATTLE_LATITUDE
@@ -35,8 +35,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater,
-            R.layout.fragment_map, container, false)
+        binding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.fragment_map, container, false
+        )
         binding.lifecycleOwner = this
 
         // TODO: Should we show and hide the action bar

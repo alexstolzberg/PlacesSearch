@@ -14,24 +14,24 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.stolz.placessearch.R
-import com.stolz.placessearch.util.Utils
+import com.stolz.placessearch.database.FavoriteDatabase
 import com.stolz.placessearch.databinding.FragmentDetailBinding
 import com.stolz.placessearch.model.places.Venue
+import com.stolz.placessearch.util.Utils
 
 class DetailFragment : Fragment() {
 
     private lateinit var binding: FragmentDetailBinding
-
-    private val detailViewModel: DetailViewModel by lazy {
-        ViewModelProviders.of(this).get(DetailViewModel::class.java)
-    }
+    private lateinit var detailViewModel: DetailViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater,
-            R.layout.fragment_detail, container, false)
+        binding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.fragment_detail, container, false
+        )
         binding.lifecycleOwner = this
 
         // TODO: Should we show and hide the action bar
@@ -41,15 +41,26 @@ class DetailFragment : Fragment() {
         val safeArgs = DetailFragmentArgs.fromBundle(args)
         val place = safeArgs.place
 
+        // Initialize ViewModel
+        val context = requireNotNull(context)
+        val favoritesDatabase = FavoriteDatabase.getInstance(context).placeDao()
+        val viewModelFactory = DetailViewModelFactory(favoritesDatabase)
+        detailViewModel =
+            ViewModelProviders.of(this, viewModelFactory).get(DetailViewModel::class.java)
+        binding.viewModel = detailViewModel
+
         binding.contentDetails.name.text = place.name
         binding.contentDetails.category.text = place.category
         val distanceToCenterText = place.distanceToCenter.toString() + " miles to center"
         binding.contentDetails.distanceToCenter.text = distanceToCenterText
         binding.contentDetails.address.text = place.address
 
-        // TODO: Favorites support (in view model?) -- check state of fab
+
+        binding.detailFab.setImageResource(if (place.isFavorite) R.drawable.ic_star_filled_white else R.drawable.ic_star_empty_white)
         binding.detailFab.setOnClickListener {
-            // TODO: Toggle favorites
+            place.isFavorite = !place.isFavorite
+            binding.detailFab.setImageResource(if (place.isFavorite) R.drawable.ic_star_filled_white else R.drawable.ic_star_empty_white)
+            detailViewModel.updateFavoriteForPlace(place)
         }
 
         detailViewModel.venueInformation.observe(this, Observer {

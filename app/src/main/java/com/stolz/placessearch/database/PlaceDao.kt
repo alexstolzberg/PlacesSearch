@@ -1,10 +1,7 @@
 package com.stolz.placessearch.database
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 
 @Dao
 interface PlaceDao {
@@ -14,15 +11,14 @@ interface PlaceDao {
     @Insert
     fun insertAll(places: List<PlaceEntity>)
 
+    @Update
+    fun updatePlace(place: PlaceEntity)
+
     @Query("SELECT * FROM favorites_table WHERE id = :key")
-    fun getPlace(key: String): LiveData<PlaceEntity>
+    fun getPlace(key: String): PlaceEntity?
 
     @Query("SELECT * FROM favorites_table")
     fun getAllPlaces(): LiveData<List<PlaceEntity>>
-
-
-    @Query("SELECT * FROM favorites_table WHERE id LIKE :id LIMIT 1")
-    fun findById(id: String): LiveData<PlaceEntity>
 
     @Delete
     fun delete(user: PlaceEntity)
