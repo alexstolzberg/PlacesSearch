@@ -65,8 +65,8 @@ class SearchResultsAdapter(private val listener: PlaceClickedListener) :
         updateFavoriteIcon(place, holder)
         holder.favorite.setOnClickListener {
             place.isFavorite = !place.isFavorite
-            // TODO: ADD OR REMOVE FAVORITE FROM DB
             updateFavoriteIcon(place, holder)
+            listener.onFavoriteClicked(place)
         }
     }
 

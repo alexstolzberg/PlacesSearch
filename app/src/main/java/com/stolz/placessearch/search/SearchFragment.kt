@@ -86,6 +86,6 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClic
     }
 
     override fun onFavoriteClicked(clickedPlace: Place) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 }

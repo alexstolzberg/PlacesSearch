@@ -2,7 +2,6 @@ package com.stolz.placessearch.details
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.Base64
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,14 +10,9 @@ import com.stolz.placessearch.model.Place
 import com.stolz.placessearch.model.places.Venue
 import com.stolz.placessearch.network.FoursquareApi
 import com.stolz.placessearch.network.GoogleMapsApi
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import retrofit2.await
 import java.io.BufferedInputStream
-import java.io.ByteArrayInputStream
-
 
 private val TAG = DetailViewModel::class.java.simpleName
 
@@ -35,57 +29,62 @@ class DetailViewModel : ViewModel() {
         get() = _staticMap
 
     private var detailsJob = Job()
-    private val detailsScope = CoroutineScope(detailsJob + Dispatchers.Main) // FIXME: THREADING!
+    private val detailsScope = CoroutineScope(detailsJob + Dispatchers.Main)
 
     fun getStaticMap(place: Place) { // TODO: DAGGER IN CONTEXT
-//        val mapWidth = Resources.getSystem().displayMetrics.widthPixels
-//        val mapHeight = 300 // TODO: ADD DIMEN
+        detailsScope.launch {
+            val bitmap = fetchStaticMap(place)
+            if (bitmap != null) {
+                _staticMap.value = bitmap
+            }
+        }
+    }
+
+    private suspend fun fetchStaticMap(place: Place): Bitmap? {
+        //        val mapWidth = Resources.getSystem().displayMetrics.widthPixels
+        //        val mapHeight = 300 // TODO: ADD DIMEN
         // TODO: PX TO DP
 
+        // FIXME: MARKER IS WRONG
         val markerString = "color:red%7c" + place.location.latitude + "," + place.location.longitude
 
-        detailsScope.launch {
-            val staticMapDeferred = GoogleMapsApi.retrofitService.getStaticMap(
-                placeMarker = markerString
-            )
+        return withContext(Dispatchers.IO) {
+            val staticMapDeferred =
+                GoogleMapsApi.retrofitService.getStaticMap(placeMarker = markerString)
             try {
                 val result = staticMapDeferred.await()
                 val inputStream = result.byteStream()
                 val bis = BufferedInputStream(inputStream)
                 val bitmap = BitmapFactory.decodeStream(bis)
-                _staticMap.value = bitmap
                 Log.v(TAG, "Static map generated successfully")
-                // TODO: CREATE BINDING ADAPTER TO SET IMAGE
+                bitmap
             } catch (t: Throwable) {
                 Log.e(TAG, "Static map generation failed - ${t.message}")
+                null
             }
         }
     }
 
-    fun stringToBitmap(image: String): Bitmap? {
-        return try {
-            val encodeByte = Base64.decode(image, Base64.DEFAULT)
-
-            val inputStream = ByteArrayInputStream(encodeByte)
-            BitmapFactory.decodeStream(inputStream)
-        } catch (e: Exception) {
-            e.message
-            null
-        }
-
-    }
-
     fun getVenueInformation(venueId: String) {
         detailsScope.launch {
+            val venueWithInfo = fetchVenueInformation(venueId)
+            if (venueWithInfo != null) {
+                _venueInformation.value = venueWithInfo
+            }
+        }
+    }
+
+    private suspend fun fetchVenueInformation(venueId: String): Venue? {
+        return withContext(Dispatchers.IO) {
             val venueInformationDeferred =
                 FoursquareApi.retrofitService.getVenueDetails(venueId = venueId)
             try {
                 val venueDeferred = venueInformationDeferred.await()
-                val venue = venueDeferred.response.venue
                 Log.v(TAG, "Got venue information successfully")
-                _venueInformation.value = venue
+                venueDeferred.response.venue
             } catch (t: Throwable) {
                 Log.e(TAG, "Failed retrieving venue information - ${t.message}")
+                null
             }
         }
     }

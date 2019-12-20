@@ -11,15 +11,12 @@ import com.stolz.placessearch.model.typeahead.Minivenue
 import com.stolz.placessearch.network.FoursquareApi
 import com.stolz.placessearch.network.FoursquareApiService
 import com.stolz.placessearch.util.NUM_METERS_PER_MILE
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.text.DecimalFormat
 
 private val TAG = SearchViewModel::class.java.simpleName
 
-class SearchViewModel() : ViewModel() {
+class SearchViewModel : ViewModel() {
 
     enum class SearchStatus { LOADING, ERROR, DONE, EMPTY }
 
@@ -43,7 +40,7 @@ class SearchViewModel() : ViewModel() {
     private var lastQuery: String = ""
 
     private var searchJob = Job()
-    private val searchScope = CoroutineScope(searchJob + Dispatchers.Main) // FIXME: THREADING!
+    private val searchScope = CoroutineScope(searchJob + Dispatchers.Main)
 
     fun queryUpdated(query: String) {
         lastQuery = query
@@ -68,16 +65,23 @@ class SearchViewModel() : ViewModel() {
         _places.value = HashSet()
         _status.value = SearchStatus.EMPTY
         searchScope.launch {
-            val typeaheadResultsDeferred =
-                FoursquareApi.retrofitService.getTypeaheadResults(
-                    query = query)
+            _typeaheadResults.value = fetchTypeaheadResults(query)
+        }
+    }
+
+    private suspend fun fetchTypeaheadResults(query: String): Set<String> {
+        return withContext(Dispatchers.IO) {
             try {
+                val typeaheadResultsDeferred = FoursquareApi.retrofitService.getTypeaheadResults(
+                    query = query
+                )
                 val result = typeaheadResultsDeferred.await()
                 val minivenues = result.response.minivenues
                 Log.v(TAG, "Typeahead search successful - ${minivenues.size} results")
-                _typeaheadResults.value = extractSuggestionsFromMinivenues(minivenues)
+                extractSuggestionsFromMinivenues(minivenues)
             } catch (t: Throwable) {
                 Log.e(TAG, "Typeahead search failed - ${t.message}")
+                HashSet<String>()
             }
         }
     }
@@ -86,21 +90,25 @@ class SearchViewModel() : ViewModel() {
         _typeaheadResults.value = HashSet()
         Log.v(TAG, "Getting places for query: \"${query}\"")
         searchScope.launch {
+            _status.value = SearchStatus.LOADING
+            val results = fetchPlaces(query)
+            _places.value = results
+            _status.value = if (results.isEmpty()) SearchStatus.EMPTY else SearchStatus.DONE
+
+        }
+    }
+    
+    private suspend fun fetchPlaces(query: String): Set<Place> {
+        return withContext(Dispatchers.IO) {
             val searchPlacesDeferred = FoursquareApi.retrofitService.getPlaces(query = query)
             try {
-                _status.value = SearchStatus.LOADING
                 val result = searchPlacesDeferred.await()
-
                 val venues = result.response.venues
-                _status.value = if (venues.isEmpty()) SearchStatus.EMPTY else SearchStatus.DONE
-
                 Log.v(TAG, "Places search successful - ${venues.size} venues retrieved")
-
-                _places.value = extractPlacesFromVenues(venues)
+                extractPlacesFromVenues(venues)
             } catch (t: Throwable) {
                 Log.e(TAG, "Places search failed - ${t.message}")
-                _status.value = SearchStatus.ERROR
-                _places.value = HashSet()
+                HashSet<Place>()
             }
         }
     }
