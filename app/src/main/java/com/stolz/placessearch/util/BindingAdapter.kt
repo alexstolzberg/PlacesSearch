@@ -3,33 +3,9 @@ package com.stolz.placessearch.util
 import android.view.View
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.stolz.placessearch.R
-import com.stolz.placessearch.model.Place
-import com.stolz.placessearch.search.SearchResultsAdapter
 import com.stolz.placessearch.search.SearchViewModel
-import com.stolz.placessearch.search.TypeaheadResultsAdapter
-
-@BindingAdapter("typeaheadData")
-fun bindTypeaheadRecyclerView(recyclerView: RecyclerView, data: Set<String>?) {
-    if (data == null) {
-        return
-    }
-    val adapter = recyclerView.adapter as TypeaheadResultsAdapter
-    recyclerView.visibility = if (data.isEmpty()) View.GONE else View.VISIBLE
-    adapter.submitList(data.toList())
-}
-
-@BindingAdapter("placeData")
-fun bindRecyclerView(recyclerView: RecyclerView, data: Set<Place>?) {
-    if (data == null) {
-        return
-    }
-    val adapter = recyclerView.adapter as SearchResultsAdapter
-    recyclerView.visibility = if (data.isEmpty()) View.GONE else View.VISIBLE
-    adapter.submitList(data.toList())
-}
 
 @BindingAdapter("searchStatus")
 fun bindSearchStatus(searchStatusImageView: ImageView, status: SearchViewModel.SearchStatus?) {

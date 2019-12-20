@@ -60,11 +60,10 @@ class SearchViewModel(private val favoritesDatabase: PlaceDao) : ViewModel() {
 
         if (query.length < FoursquareApiService.FOURSQUARE_MIN_QUERY_LENGTH) {
             Log.w(TAG, "Query is not long enough to get type ahead suggestions")
+            _typeaheadResults.value = HashSet()
             return
         }
 
-        _places.value = HashSet()
-        _status.value = SearchStatus.EMPTY
         searchScope.launch {
             _typeaheadResults.value = fetchTypeaheadResults(query)
         }

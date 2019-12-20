@@ -1,6 +1,7 @@
 package com.stolz.placessearch.search
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -16,6 +18,9 @@ import com.stolz.placessearch.database.FavoriteDatabase
 import com.stolz.placessearch.databinding.FragmentSearchBinding
 import com.stolz.placessearch.model.Place
 import com.stolz.placessearch.util.Utils
+import java.lang.reflect.Type
+
+private val TAG = SearchFragment::class.java.simpleName
 
 class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClickedListener {
 
@@ -62,7 +67,31 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClic
         binding.typeaheadResultsList.addItemDecoration(
             DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
         )
+        searchViewModel.typeaheadResults.observe(this, Observer { typeAheadResults ->
+            if (searchViewModel.status.value == SearchViewModel.SearchStatus.LOADING || typeAheadResults.isEmpty()) {
+                binding.typeaheadResultsList.visibility = View.GONE
+                Log.d(TAG, "Hiding typeahead results list")
+            } else {
+                val adapter = binding.typeaheadResultsList.adapter as TypeaheadResultsAdapter
+                adapter.submitList(typeAheadResults.toList())
+                binding.typeaheadResultsList.visibility = View.VISIBLE
+                Log.d(TAG, "Showing and updating typeahead results list")
+            }
+        })
+
+
         binding.searchResultsList.adapter = SearchResultsAdapter(this)
+        searchViewModel.places.observe(this, Observer { placeResults->
+            if (placeResults.isEmpty()) {
+                binding.searchResultsList.visibility = View.GONE
+                Log.d(TAG, "Hiding place results list")
+            } else {
+                val adapter = binding.searchResultsList.adapter as SearchResultsAdapter
+                adapter.submitList(placeResults.toList())
+                binding.searchResultsList.visibility = View.VISIBLE
+                Log.d(TAG, "Showing and updating place results list")
+            }
+        })
 
         binding.fab.setOnClickListener { view ->
             view.findNavController()

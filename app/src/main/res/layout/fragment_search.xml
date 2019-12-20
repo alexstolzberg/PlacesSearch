@@ -26,22 +26,6 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/typeahead_results_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/card_background"
-            android:maxHeight="300dp"
-            android:visibility="gone"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/search_bar"
-            app:typeaheadData="@{viewModel.typeaheadResults}"
-            tools:itemCount="16"
-            tools:listitem="@layout/row_place_search_result" />
-
-        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/search_results_list"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -53,7 +37,22 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/search_bar"
-            app:placeData="@{viewModel.places}"
+            tools:itemCount="16"
+            tools:listitem="@layout/row_place_search_result" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/typeahead_results_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/card_background"
+            android:elevation="16dp"
+            android:maxHeight="300dp"
+            android:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/search_bar"
             tools:itemCount="16"
             tools:listitem="@layout/row_place_search_result" />
 
