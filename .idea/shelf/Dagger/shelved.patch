@@ -1,0 +1,345 @@
+Index: app/src/main/java/com/stolz/placessearch/network/GoogleMapsApi.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/stolz/placessearch/network/GoogleMapsApi.kt	(date 1576891277000)
++++ app/src/main/java/com/stolz/placessearch/network/GoogleMapsApi.kt	(date 1576891277000)
+@@ -0,0 +1,22 @@
++package com.stolz.placessearch.network
++
++import com.stolz.placessearch.BuildConfig
++import com.stolz.placessearch.util.DEFAULT_ZOOM_LEVEL
++import okhttp3.ResponseBody
++import retrofit2.Call
++import retrofit2.http.GET
++import retrofit2.http.Query
++
++interface GoogleMapsApi {
++
++    @GET("staticmap")
++    fun getStaticMap(
++        @Query("center") center: String = "Seattle+Washington",
++        @Query("zoom") zoom: Int = DEFAULT_ZOOM_LEVEL,
++        @Query("size") size: String = "300x200",
++        @Query("mapType") mapType: String = "roadmap",
++        @Query("markers", encoded = true) centerMarker: String = "",
++        @Query("markers", encoded = true) placeMarker: String = "",
++        @Query("key") key: String = BuildConfig.GOOGLE_MAPS_API_KEY
++    ): Call<ResponseBody>
++}
+\ No newline at end of file
+Index: app/src/main/java/com/stolz/placessearch/search/SearchViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.stolz.placessearch.search\n\nimport android.util.Log\nimport androidx.lifecycle.LiveData\nimport androidx.lifecycle.MutableLiveData\nimport androidx.lifecycle.ViewModel\nimport com.google.android.gms.maps.model.LatLng\nimport com.stolz.placessearch.database.PlaceDao\nimport com.stolz.placessearch.model.Place\nimport com.stolz.placessearch.model.places.Venue\nimport com.stolz.placessearch.model.typeahead.Minivenue\nimport com.stolz.placessearch.network.FoursquareApi\nimport com.stolz.placessearch.network.FoursquareApiService\nimport com.stolz.placessearch.util.NUM_METERS_PER_MILE\nimport kotlinx.coroutines.*\nimport java.text.DecimalFormat\n\nprivate val TAG = SearchViewModel::class.java.simpleName\n\nclass SearchViewModel(private val favoritesDatabase: PlaceDao) : ViewModel() {\n\n    enum class SearchStatus { LOADING, ERROR, DONE, EMPTY }\n\n    // The list of places returned from the query\n    private val _typeaheadResults = MutableLiveData<Set<String>>()\n    val typeaheadResults: LiveData<Set<String>>\n        get() = _typeaheadResults\n\n    // The status of loading places\n    private val _status =\n        MutableLiveData<SearchStatus>()\n    val status: LiveData<SearchStatus>\n        get() = _status\n\n    // The list of places returned from the query\n    private val _places = MutableLiveData<Set<Place>>()\n    val places: LiveData<Set<Place>>\n        get() = _places\n\n    // TODO: LiveData?\n    private var lastQuery: String = \"\"\n\n    private var searchJob = Job()\n    private val searchScope = CoroutineScope(searchJob + Dispatchers.Main)\n\n    fun updateQuery(query: String) {\n        lastQuery = query\n    }\n\n    fun getTypeaheadResults(query: String) {\n        Log.v(TAG, \"Getting typeahead results for query: \\\"${query}\\\"\")\n\n        if (query == lastQuery) {\n            // If the query matches the last query one of the typeahead results was picked\n            _typeaheadResults.value = HashSet()\n            return\n        }\n\n        lastQuery = query\n\n        if (query.length < FoursquareApiService.FOURSQUARE_MIN_QUERY_LENGTH) {\n            Log.w(TAG, \"Query is not long enough to get type ahead suggestions\")\n            _typeaheadResults.value = HashSet()\n            return\n        }\n\n        searchScope.launch {\n            _typeaheadResults.value = fetchTypeaheadResults(query)\n        }\n    }\n\n    private suspend fun fetchTypeaheadResults(query: String): Set<String> {\n        return withContext(Dispatchers.IO) {\n            try {\n                val typeaheadResultsDeferred = FoursquareApi.retrofitService.getTypeaheadResults(\n                    query = query\n                )\n                val result = typeaheadResultsDeferred.await()\n                val minivenues = result.response.minivenues\n                Log.v(TAG, \"Typeahead search successful - ${minivenues.size} results\")\n                extractSuggestionsFromMinivenues(minivenues)\n            } catch (t: Throwable) {\n                Log.e(TAG, \"Typeahead search failed - ${t.message}\")\n                HashSet<String>()\n            }\n        }\n    }\n\n    fun getPlaces(query: String) {\n        _typeaheadResults.value = HashSet()\n        Log.v(TAG, \"Getting places for query: \\\"${query}\\\"\")\n        searchScope.launch {\n            _status.value = SearchStatus.LOADING\n            val results = fetchPlaces(query)\n            _places.value = results\n            _status.value = if (results.isEmpty()) SearchStatus.EMPTY else SearchStatus.DONE\n\n        }\n    }\n\n    private suspend fun fetchPlaces(query: String): Set<Place> {\n        return withContext(Dispatchers.IO) {\n            val searchPlacesDeferred = FoursquareApi.retrofitService.getPlaces(query = query)\n            try {\n                val result = searchPlacesDeferred.await()\n                val venues = result.response.venues\n                Log.v(TAG, \"Places search successful - ${venues.size} venues retrieved\")\n                extractPlacesFromVenues(venues)\n            } catch (t: Throwable) {\n                Log.e(TAG, \"Places search failed - ${t.message}\")\n                HashSet<Place>()\n            }\n        }\n    }\n\n    fun updateFavoriteForPlace(place: Place) {\n        searchScope.launch {\n            withContext(Dispatchers.IO) {\n                val placeEntity = Place.toPlaceEntity(place)\n                val placeInDb = favoritesDatabase.getPlace(place.id)\n                if (placeInDb == null) {\n                    favoritesDatabase.insert(placeEntity)\n                } else {\n                    favoritesDatabase.updatePlace(placeEntity)\n\n                }\n            }\n        }\n    }\n\n    /**\n     * This method takes the Minivenues model object and extracts type ahead suggestions from it to\n     * return to the caller\n     *\n     * @param minivenues The model object to extract results from\n     * @return A Set of type ahead search results (a Set is used to automatically handle duplicates)\n     */\n    // TODO: SEE IF THERE IS A WAY TO EASILY MAP THE OBJECTS\n    private fun extractSuggestionsFromMinivenues(minivenues: List<Minivenue>): Set<String> {\n        val typeAheadSuggestions = java.util.HashSet<String>()\n        for (minivenue in minivenues) {\n            val minivenueName = minivenue.name\n            typeAheadSuggestions.add(minivenueName)\n        }\n        return typeAheadSuggestions\n    }\n\n    /**\n     * This method takes the Venues model object and extracts places from it to return to the caller\n     *\n     * @param venues The model object to extract results from\n     * @return A Set of place results -- a Set is used to filter out duplicates automatically\n     */\n    // TODO: SEE IF THERE IS A WAY TO EASILY MAP THE OBJECTS\n    private fun extractPlacesFromVenues(venues: List<Venue>): Set<Place> {\n        val places = HashSet<Place>()\n        for (venue in venues) {\n            // Check the database to see if the current place has already been favorited\n            val isFavorite = isVenueFavorited(venue.id)\n            val id = venue.id\n            val name = venue.name\n            var categoryName = \"\"\n            var iconUrl = \"\"\n            if (venue.categories.isNotEmpty()) {\n                val category = venue.categories[0]\n                categoryName = category.name\n\n                if (category.icon != null) {\n                    val prefix = category.icon.prefix\n                    val suffix = category.icon.suffix\n                    iconUrl = prefix + \"88\" + suffix\n                }\n            }\n\n            val loc = venue.location\n            val location = LatLng(loc.lat, loc.lng)\n            val distance = loc.distance / NUM_METERS_PER_MILE\n            val numberFormat = DecimalFormat(\"#.00\")\n            val distanceFromCenter = java.lang.Double.valueOf(numberFormat.format(distance))\n            val formattedAddress = loc.formattedAddress\n            var address = \"\"\n            if (formattedAddress.size >= 2) {\n                address = formattedAddress[0] + \"\\n\" + formattedAddress[1]\n            }\n\n            val p = Place(\n                id = id,\n                name = name,\n                category = categoryName,\n                address = address,\n                location = location,\n                distanceToCenter = distanceFromCenter,\n                iconUrl = iconUrl,\n                isFavorite = isFavorite\n            )\n            places.add(p)\n        }\n\n        return places\n    }\n\n    private fun isVenueFavorited(venueId: String): Boolean {\n        val entity = favoritesDatabase.getPlace(venueId)\n        return entity != null\n    }\n\n    override fun onCleared() {\n        super.onCleared()\n        searchJob.cancel()\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/stolz/placessearch/search/SearchViewModel.kt	(revision f4c5490346e0a6b136f775507a0fda46b9253350)
++++ app/src/main/java/com/stolz/placessearch/search/SearchViewModel.kt	(date 1576891240000)
+@@ -3,8 +3,8 @@
+ import android.util.Log
+ import androidx.lifecycle.LiveData
+ import androidx.lifecycle.MutableLiveData
+-import androidx.lifecycle.ViewModel
+ import com.google.android.gms.maps.model.LatLng
++import com.stolz.placessearch.BaseViewModel
+ import com.stolz.placessearch.database.PlaceDao
+ import com.stolz.placessearch.model.Place
+ import com.stolz.placessearch.model.places.Venue
+@@ -14,10 +14,14 @@
+ import com.stolz.placessearch.util.NUM_METERS_PER_MILE
+ import kotlinx.coroutines.*
+ import java.text.DecimalFormat
++import javax.inject.Inject
+ 
+ private val TAG = SearchViewModel::class.java.simpleName
+ 
+-class SearchViewModel(private val favoritesDatabase: PlaceDao) : ViewModel() {
++class SearchViewModel(private val favoritesDatabase: PlaceDao) : BaseViewModel() {
++
++    @Inject
++    lateinit var foursq
+ 
+     enum class SearchStatus { LOADING, ERROR, DONE, EMPTY }
+ 
+Index: app/src/main/java/com/stolz/placessearch/details/DetailViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.stolz.placessearch.details\n\nimport android.content.Context\nimport android.graphics.Bitmap\nimport android.graphics.BitmapFactory\nimport android.util.Log\nimport androidx.lifecycle.LiveData\nimport androidx.lifecycle.MutableLiveData\nimport androidx.lifecycle.ViewModel\nimport com.stolz.placessearch.database.PlaceDao\nimport com.stolz.placessearch.model.Place\nimport com.stolz.placessearch.model.places.Venue\nimport com.stolz.placessearch.network.FoursquareApi\nimport com.stolz.placessearch.network.GoogleMapsApi\nimport com.stolz.placessearch.util.SEATTLE_LATITUDE\nimport com.stolz.placessearch.util.SEATTLE_LONGITUDE\nimport com.stolz.placessearch.util.Utils\nimport kotlinx.coroutines.*\nimport okhttp3.ResponseBody\nimport retrofit2.await\nimport java.io.BufferedInputStream\n\nprivate val TAG = DetailViewModel::class.java.simpleName\n\nclass DetailViewModel(\n    private val context: Context,\n    private val favoritesDatabase: PlaceDao\n) : ViewModel() {\n\n    // The detailed venue information\n    private val _venueInformation = MutableLiveData<Venue>()\n    val venueInformation: LiveData<Venue>\n        get() = _venueInformation\n\n    // The static map\n    private val _staticMap = MutableLiveData<Bitmap>()\n    val staticMap: LiveData<Bitmap>\n        get() = _staticMap\n\n    private var detailsJob = Job()\n    private val detailsScope = CoroutineScope(detailsJob + Dispatchers.Main)\n\n    fun getStaticMap(place: Place) { // TODO: DAGGER IN CONTEXT\n        detailsScope.launch {\n            val bitmap = fetchStaticMap(place)\n            if (bitmap != null) {\n                _staticMap.value = bitmap\n            }\n        }\n    }\n\n    private suspend fun fetchStaticMap(place: Place): Bitmap? {\n        val centerMarkerString = Utils.generateStaticMarkerQueryParam(SEATTLE_LATITUDE, SEATTLE_LONGITUDE, Utils.MarkerColor.RED)\n        val placeMarkerString = Utils.generateStaticMarkerQueryParam(place.location.latitude, place.location.longitude, Utils.MarkerColor.GREEN)\n\n        return withContext(Dispatchers.IO) {\n            val staticMapDeferred =\n                GoogleMapsApi.retrofitService.getStaticMap(\n                    centerMarker = centerMarkerString,\n                    placeMarker = placeMarkerString,\n                    zoom = Utils.generateZoomLevel(place.distanceToCenter),\n                    size = Utils.generateStaticMapDimensions(context.resources)\n                )\n            try {\n                val result = staticMapDeferred.await()\n                Log.v(TAG, \"Static map generated successfully\")\n                createBitmap(result)\n            } catch (t: Throwable) {\n                Log.e(TAG, \"Static map generation failed - ${t.message}\")\n                null\n            }\n        }\n    }\n\n    fun getVenueInformation(venueId: String) {\n        detailsScope.launch {\n            val venueWithInfo = fetchVenueInformation(venueId)\n            if (venueWithInfo != null) {\n                _venueInformation.value = venueWithInfo\n            }\n        }\n    }\n\n    private suspend fun fetchVenueInformation(venueId: String): Venue? {\n        return withContext(Dispatchers.IO) {\n            val venueInformationDeferred =\n                FoursquareApi.retrofitService.getVenueDetails(venueId = venueId)\n            try {\n                val venueDeferred = venueInformationDeferred.await()\n                Log.v(TAG, \"Got venue information successfully\")\n                venueDeferred.response.venue\n            } catch (t: Throwable) {\n                Log.e(TAG, \"Failed retrieving venue information - ${t.message}\")\n                null\n            }\n        }\n    }\n\n    fun updateFavoriteForPlace(place: Place) {\n        detailsScope.launch {\n            withContext(Dispatchers.IO) {\n                val placeEntity = Place.toPlaceEntity(place)\n                val placeInDb = favoritesDatabase.getPlace(place.id)\n                if (placeInDb == null) {\n                    favoritesDatabase.insert(placeEntity)\n                } else {\n                    favoritesDatabase.updatePlace(placeEntity)\n\n                }\n            }\n        }\n    }\n\n    private fun createBitmap(responseBody: ResponseBody): Bitmap {\n        val inputStream = responseBody.byteStream()\n        val bis = BufferedInputStream(inputStream)\n        return BitmapFactory.decodeStream(bis)\n    }\n\n    override fun onCleared() {\n        super.onCleared()\n        detailsJob.cancel()\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/stolz/placessearch/details/DetailViewModel.kt	(revision f4c5490346e0a6b136f775507a0fda46b9253350)
++++ app/src/main/java/com/stolz/placessearch/details/DetailViewModel.kt	(date 1576891066000)
+@@ -6,7 +6,7 @@
+ import android.util.Log
+ import androidx.lifecycle.LiveData
+ import androidx.lifecycle.MutableLiveData
+-import androidx.lifecycle.ViewModel
++import com.stolz.placessearch.BaseViewModel
+ import com.stolz.placessearch.database.PlaceDao
+ import com.stolz.placessearch.model.Place
+ import com.stolz.placessearch.model.places.Venue
+@@ -25,7 +25,7 @@
+ class DetailViewModel(
+     private val context: Context,
+     private val favoritesDatabase: PlaceDao
+-) : ViewModel() {
++) : BaseViewModel() {
+ 
+     // The detailed venue information
+     private val _venueInformation = MutableLiveData<Venue>()
+@@ -50,8 +50,16 @@
+     }
+ 
+     private suspend fun fetchStaticMap(place: Place): Bitmap? {
+-        val centerMarkerString = Utils.generateStaticMarkerQueryParam(SEATTLE_LATITUDE, SEATTLE_LONGITUDE, Utils.MarkerColor.RED)
+-        val placeMarkerString = Utils.generateStaticMarkerQueryParam(place.location.latitude, place.location.longitude, Utils.MarkerColor.GREEN)
++        val centerMarkerString = Utils.generateStaticMarkerQueryParam(
++            SEATTLE_LATITUDE,
++            SEATTLE_LONGITUDE,
++            Utils.MarkerColor.RED
++        )
++        val placeMarkerString = Utils.generateStaticMarkerQueryParam(
++            place.location.latitude,
++            place.location.longitude,
++            Utils.MarkerColor.GREEN
++        )
+ 
+         return withContext(Dispatchers.IO) {
+             val staticMapDeferred =
+Index: app/src/main/java/com/stolz/placessearch/dagger/module/NetworkModule.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/stolz/placessearch/dagger/module/NetworkModule.kt	(date 1576891240000)
++++ app/src/main/java/com/stolz/placessearch/dagger/module/NetworkModule.kt	(date 1576891240000)
+@@ -0,0 +1,62 @@
++package com.stolz.placessearch.dagger.module
++
++import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
++import com.squareup.moshi.Moshi
++import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
++import dagger.Module
++import dagger.Provides
++import dagger.Reusable
++import retrofit2.Retrofit
++import retrofit2.converter.moshi.MoshiConverterFactory
++import retrofit2.converter.scalars.ScalarsConverterFactory
++import javax.inject.Named
++
++private const val GOOGLE_BASE_URL = "https://maps.googleapis.com/maps/api/"
++private const val FOURSQUARE_BASE_URL = "https://api.foursquare.com/v2/"
++
++@Module
++object NetworkModule {
++
++    @Provides
++    @Reusable
++    @JvmStatic
++    @Named("google_retrofit")
++    internal fun providesGoogleRetrofit(): Retrofit {
++        return Retrofit.Builder()
++            .baseUrl(GOOGLE_BASE_URL)
++            .addConverterFactory(ScalarsConverterFactory.create())
++            .addCallAdapterFactory(CoroutineCallAdapterFactory())
++            .build()
++    }
++
++    @Provides
++    @Reusable
++    @JvmStatic
++    @Named("foursquare_retrofit")
++    internal fun providesFoursquareRetrofit(moshi: Moshi): Retrofit {
++        return Retrofit.Builder()
++            .baseUrl(FOURSQUARE_BASE_URL)
++            .addConverterFactory(MoshiConverterFactory.create(moshi))
++            .addCallAdapterFactory(CoroutineCallAdapterFactory())
++            .build()
++    }
++
++    @Provides
++    @Reusable
++    @JvmStatic
++    internal fun providesMoshi(): Moshi {
++        return Moshi.Builder()
++            .add(KotlinJsonAdapterFactory())
++            .build()
++    }
++
++    @Provides
++    @Reusable
++    @JvmStatic
++    internal fun providesGoogleMapsApiService(): Moshi {
++        return Moshi.Builder()
++            .add(KotlinJsonAdapterFactory())
++            .build()
++    }
++
++}
+Index: app/src/main/java/com/stolz/placessearch/network/FoursquareApiService.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.stolz.placessearch.network\n\nimport com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory\nimport com.squareup.moshi.Moshi\nimport com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory\nimport com.stolz.placessearch.model.places.Object\nimport com.stolz.placessearch.util.SEATTLE_LATITUDE\nimport com.stolz.placessearch.util.SEATTLE_LONGITUDE\nimport com.stolz.placessearch.util.Utils\nimport kotlinx.coroutines.Deferred\nimport retrofit2.Retrofit\nimport retrofit2.converter.moshi.MoshiConverterFactory\nimport retrofit2.http.GET\nimport retrofit2.http.Path\nimport retrofit2.http.Query\n\nprivate const val BASE_URL = \"https://api.foursquare.com/v2/\"\nprivate const val FOURSQUARE_DEFAULT_LIMIT = 50\n\n// TODO: MOVE THESE TO A MORE SECURE PLACE\nprivate const val CLIENT_ID = \"WD3UQZ03SJ4VDZSDEWXBHPSOHZSNRGQIBAEY3Q0UGWPXXYJH\"\nprivate const val CLIENT_SECRET = \"L2NUD1USBGSCRLZF1WVA4PEE0VD2PPAR01RF3IJ5QB4BABCD\"\n\nprivate val moshi = Moshi.Builder()\n    .add(KotlinJsonAdapterFactory())\n    .build()\n\nprivate val retrofit = Retrofit.Builder()\n    .addConverterFactory(MoshiConverterFactory.create(moshi))\n    .addCallAdapterFactory(CoroutineCallAdapterFactory())\n    .baseUrl(BASE_URL)\n    .build()\n\ninterface FoursquareApiService {\n\n    companion object {\n        const val FOURSQUARE_MIN_QUERY_LENGTH = 3\n    }\n\n    @GET(\"venues/suggestcompletion\")\n    fun getTypeaheadResults(\n        @Query(\"client_id\") clientId: String = CLIENT_ID,\n        @Query(\"client_secret\") clientSecret: String = CLIENT_SECRET,\n        @Query(\"ll\") latLng: String = Utils.generateStringFromLatLng(\n            SEATTLE_LATITUDE,\n            SEATTLE_LONGITUDE\n        ),\n        @Query(\"limit\") limit: String = FOURSQUARE_DEFAULT_LIMIT.toString(),\n        @Query(\"query\") query: String,\n        @Query(\"v\") timestamp: String = Utils.generateDateString()\n    ): Deferred<com.stolz.placessearch.model.typeahead.Object>\n\n    @GET(\"venues/search\")\n    fun getPlaces(\n        @Query(\"client_id\") clientId: String = CLIENT_ID,\n        @Query(\"client_secret\") clientSecret: String = CLIENT_SECRET,\n        @Query(\"ll\") latLng: String = Utils.generateStringFromLatLng(\n            SEATTLE_LATITUDE,\n            SEATTLE_LONGITUDE\n        ),\n        @Query(\"limit\") limit: String = FOURSQUARE_DEFAULT_LIMIT.toString(),\n        @Query(\"query\") query: String,\n        @Query(\"v\") timestamp: String = Utils.generateDateString()\n    ): Deferred<Object>\n\n    @GET(\"venues/{venueId}\")\n    fun getVenueDetails(\n        @Path(\"venueId\") venueId: String,\n        @Query(\"client_id\") clientId: String = CLIENT_ID,\n        @Query(\"client_secret\") clientSecret: String = CLIENT_SECRET,\n        @Query(\"v\") timestamp: String = Utils.generateDateString()\n    ): Deferred<com.stolz.placessearch.model.venue_information.Object>\n}\n\nobject FoursquareApi {\n    val retrofitService: FoursquareApiService by lazy { retrofit.create(FoursquareApiService::class.java) }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/stolz/placessearch/network/FoursquareApiService.kt	(revision f4c5490346e0a6b136f775507a0fda46b9253350)
++++ app/src/main/java/com/stolz/placessearch/network/FoursquareApiService.kt	(date 1576889215000)
+@@ -3,6 +3,7 @@
+ import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+ import com.squareup.moshi.Moshi
+ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
++import com.stolz.placessearch.BuildConfig
+ import com.stolz.placessearch.model.places.Object
+ import com.stolz.placessearch.util.SEATTLE_LATITUDE
+ import com.stolz.placessearch.util.SEATTLE_LONGITUDE
+@@ -17,10 +18,6 @@
+ private const val BASE_URL = "https://api.foursquare.com/v2/"
+ private const val FOURSQUARE_DEFAULT_LIMIT = 50
+ 
+-// TODO: MOVE THESE TO A MORE SECURE PLACE
+-private const val CLIENT_ID = "WD3UQZ03SJ4VDZSDEWXBHPSOHZSNRGQIBAEY3Q0UGWPXXYJH"
+-private const val CLIENT_SECRET = "L2NUD1USBGSCRLZF1WVA4PEE0VD2PPAR01RF3IJ5QB4BABCD"
+-
+ private val moshi = Moshi.Builder()
+     .add(KotlinJsonAdapterFactory())
+     .build()
+@@ -39,8 +36,8 @@
+ 
+     @GET("venues/suggestcompletion")
+     fun getTypeaheadResults(
+-        @Query("client_id") clientId: String = CLIENT_ID,
+-        @Query("client_secret") clientSecret: String = CLIENT_SECRET,
++        @Query("client_id") clientId: String = BuildConfig.FOURSQUARE_CLIENT_ID,
++        @Query("client_secret") clientSecret: String = BuildConfig.FOURSQUARE_CLIENT_SECRET,
+         @Query("ll") latLng: String = Utils.generateStringFromLatLng(
+             SEATTLE_LATITUDE,
+             SEATTLE_LONGITUDE
+@@ -52,8 +49,8 @@
+ 
+     @GET("venues/search")
+     fun getPlaces(
+-        @Query("client_id") clientId: String = CLIENT_ID,
+-        @Query("client_secret") clientSecret: String = CLIENT_SECRET,
++        @Query("client_id") clientId: String = BuildConfig.FOURSQUARE_CLIENT_ID,
++        @Query("client_secret") clientSecret: String = BuildConfig.FOURSQUARE_CLIENT_SECRET,
+         @Query("ll") latLng: String = Utils.generateStringFromLatLng(
+             SEATTLE_LATITUDE,
+             SEATTLE_LONGITUDE
+@@ -66,8 +63,8 @@
+     @GET("venues/{venueId}")
+     fun getVenueDetails(
+         @Path("venueId") venueId: String,
+-        @Query("client_id") clientId: String = CLIENT_ID,
+-        @Query("client_secret") clientSecret: String = CLIENT_SECRET,
++        @Query("client_id") clientId: String = BuildConfig.FOURSQUARE_CLIENT_ID,
++        @Query("client_secret") clientSecret: String = BuildConfig.FOURSQUARE_CLIENT_SECRET,
+         @Query("v") timestamp: String = Utils.generateDateString()
+     ): Deferred<com.stolz.placessearch.model.venue_information.Object>
+ }
+Index: app/src/main/java/com/stolz/placessearch/BaseViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/stolz/placessearch/BaseViewModel.kt	(date 1576891020000)
++++ app/src/main/java/com/stolz/placessearch/BaseViewModel.kt	(date 1576891020000)
+@@ -0,0 +1,28 @@
++package com.stolz.placessearch
++
++import androidx.lifecycle.ViewModel
++import com.stolz.placessearch.dagger.module.NetworkModule
++import com.stolz.placessearch.dagger.module.ViewModelComponent
++import com.stolz.placessearch.details.DetailViewModel
++import com.stolz.placessearch.search.SearchViewModel
++
++abstract class BaseViewModel:ViewModel() {
++    private val injector: ViewModelComponent = DaggerViewModelInjector
++        .builder()
++        .networkModule(NetworkModule)
++        .build()
++
++    init {
++        inject()
++    }
++
++    /**
++     * Injects the required dependencies
++     */
++    private fun inject() {
++        when (this) {
++            is SearchViewModel -> injector.inject(this)
++            is DetailViewModel -> injector.inject(this)
++        }
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/stolz/placessearch/network/GoogleMapsApiService.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.stolz.placessearch.network\n\nimport com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory\nimport com.stolz.placessearch.util.DEFAULT_ZOOM_LEVEL\nimport okhttp3.ResponseBody\nimport retrofit2.Call\nimport retrofit2.Retrofit\nimport retrofit2.converter.scalars.ScalarsConverterFactory\nimport retrofit2.http.GET\nimport retrofit2.http.Query\n\nprivate const val BASE_URL = \"https://maps.googleapis.com/maps/api/\"\n\n// TODO: MOVE THIS TO A MORE SECURE PLACE\nprivate const val GOOGLE_MAPS_KEY = \"AIzaSyDtOKOqWrTMcctBzkECJzwKPRXJt2LLClw\"\n\nprivate val retrofit = Retrofit.Builder()\n    .addConverterFactory(ScalarsConverterFactory.create())\n    .addCallAdapterFactory(CoroutineCallAdapterFactory())\n    .baseUrl(BASE_URL)\n    .build()\n\ninterface GoogleMapsApiService {\n\n    @GET(\"staticmap\")\n    fun getStaticMap(\n        @Query(\"center\") center: String = \"Seattle+Washington\",\n        @Query(\"zoom\") zoom: Int = DEFAULT_ZOOM_LEVEL,\n        @Query(\"size\") size: String = \"300x200\",\n        @Query(\"mapType\") mapType: String = \"roadmap\",\n        @Query(\"markers\", encoded = true) centerMarker: String = \"\",\n        @Query(\"markers\", encoded = true) placeMarker: String = \"\",\n        @Query(\"key\") key: String = GOOGLE_MAPS_KEY\n    ): Call<ResponseBody>\n}\n\nobject GoogleMapsApi {\n    val retrofitService: GoogleMapsApiService by lazy { retrofit.create(GoogleMapsApiService::class.java) }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/stolz/placessearch/network/GoogleMapsApiService.kt	(revision f4c5490346e0a6b136f775507a0fda46b9253350)
++++ app/src/main/java/com/stolz/placessearch/network/GoogleMapsApiService.kt	(date 1576889215000)
+@@ -1,6 +1,7 @@
+ package com.stolz.placessearch.network
+ 
+ import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
++import com.stolz.placessearch.BuildConfig
+ import com.stolz.placessearch.util.DEFAULT_ZOOM_LEVEL
+ import okhttp3.ResponseBody
+ import retrofit2.Call
+@@ -11,9 +12,6 @@
+ 
+ private const val BASE_URL = "https://maps.googleapis.com/maps/api/"
+ 
+-// TODO: MOVE THIS TO A MORE SECURE PLACE
+-private const val GOOGLE_MAPS_KEY = "AIzaSyDtOKOqWrTMcctBzkECJzwKPRXJt2LLClw"
+-
+ private val retrofit = Retrofit.Builder()
+     .addConverterFactory(ScalarsConverterFactory.create())
+     .addCallAdapterFactory(CoroutineCallAdapterFactory())
+@@ -30,7 +28,7 @@
+         @Query("mapType") mapType: String = "roadmap",
+         @Query("markers", encoded = true) centerMarker: String = "",
+         @Query("markers", encoded = true) placeMarker: String = "",
+-        @Query("key") key: String = GOOGLE_MAPS_KEY
++        @Query("key") key: String = BuildConfig.GOOGLE_MAPS_API_KEY
+     ): Call<ResponseBody>
+ }
+ 
+Index: app/src/main/java/com/stolz/placessearch/dagger/module/ViewModelComponent.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/stolz/placessearch/dagger/module/ViewModelComponent.kt	(date 1576890962000)
++++ app/src/main/java/com/stolz/placessearch/dagger/module/ViewModelComponent.kt	(date 1576890962000)
+@@ -0,0 +1,20 @@
++package com.stolz.placessearch.dagger.module
++
++import com.stolz.placessearch.details.DetailViewModel
++import com.stolz.placessearch.search.SearchViewModel
++import dagger.Component
++import javax.inject.Singleton
++
++@Singleton
++@Component(modules = [NetworkModule::class])
++interface ViewModelComponent {
++    fun inject(searchViewModel: SearchViewModel)
++    fun inject(detailViewModel: DetailViewModel)
++
++    @Component.Builder
++    interface Builder {
++        fun build(): ViewModelComponent
++
++        fun networkModule(networkModule: NetworkModule): Builder
++    }
++}
+\ No newline at end of file

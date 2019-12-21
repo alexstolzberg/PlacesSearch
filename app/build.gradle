@@ -8,6 +8,9 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
+def apikeyPropertiesFile = rootProject.file("apikey.properties")
+def apikeyProperties = new Properties()
+apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
 
 android {
     compileSdkVersion 28
@@ -19,6 +22,10 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "FOURSQUARE_CLIENT_ID", apikeyProperties['FOURSQUARE_CLIENT_ID'])
+        buildConfigField("String", "FOURSQUARE_CLIENT_SECRET", apikeyProperties['FOURSQUARE_CLIENT_SECRET'])
+        buildConfigField("String", "GOOGLE_MAPS_API_KEY", apikeyProperties['GOOGLE_MAPS_API_KEY'])
     }
     buildTypes {
         release {
@@ -80,6 +87,10 @@ dependencies {
 
     // Google Maps
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
+
+    // Dagger
+    implementation "com.google.dagger:dagger:2.25.3"
+    kapt "com.google.dagger:dagger-compiler:2.25.3"
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.12'
