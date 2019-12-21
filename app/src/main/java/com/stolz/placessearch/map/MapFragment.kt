@@ -1,5 +1,7 @@
 package com.stolz.placessearch.map
 
+import android.content.res.Configuration
+import android.content.res.Resources.NotFoundException
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,6 +16,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.stolz.placessearch.R
@@ -69,6 +72,25 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         Log.d(TAG, "Google Map is ready!")
         map = googleMap
+
+        try {
+            val style =
+                when (context?.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)) {
+                    Configuration.UI_MODE_NIGHT_YES -> MapStyleOptions.loadRawResourceStyle(
+                        activity,
+                        R.raw.dark_map
+                    )
+                    else -> MapStyleOptions.loadRawResourceStyle(activity, R.raw.light_map)
+                }
+
+            val success = googleMap.setMapStyle(style)
+            if (!success) {
+                Log.e(TAG, "Style parsing failed.")
+            }
+        } catch (e: NotFoundException) {
+            Log.e(TAG, "Can't find style. Error: ", e)
+        }
+
 
         // Add markers for all of the places in the search results
         addPlaceMarkers()
