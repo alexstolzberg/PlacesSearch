@@ -1,9 +1,7 @@
 package com.stolz.placessearch.network
 
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
-import com.stolz.placessearch.util.SEATTLE_LATITUDE
-import com.stolz.placessearch.util.SEATTLE_LONGITUDE
-import com.stolz.placessearch.util.Utils
+import com.stolz.placessearch.util.DEFAULT_ZOOM_LEVEL
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -24,19 +22,14 @@ private val retrofit = Retrofit.Builder()
 
 interface GoogleMapsApiService {
 
-    // FIXME: MARKERS NOT ADDING TO STATIC MAP
-    // FIXME: CLEAN UP
     @GET("staticmap")
     fun getStaticMap(
         @Query("center") center: String = "Seattle+Washington",
-        @Query("zoom") zoom: Int = 15, // TODO: CALL GENERATE ZOOM AND PASS IN VALUE
-        @Query("size") size: String = Utils.generateStringFromWidthAndHeight(300, 200),
+        @Query("zoom") zoom: Int = DEFAULT_ZOOM_LEVEL,
+        @Query("size") size: String = "300x200",
         @Query("mapType") mapType: String = "roadmap",
-        @Query("markers") centerMarker: String = "color:red%7c" + Utils.generateStringFromLatLng(
-            SEATTLE_LATITUDE,
-            SEATTLE_LONGITUDE
-        ),
-        @Query("markers") placeMarker: String,
+        @Query("markers", encoded = true) centerMarker: String = "",
+        @Query("markers", encoded = true) placeMarker: String = "",
         @Query("key") key: String = GOOGLE_MAPS_KEY
     ): Call<ResponseBody>
 }

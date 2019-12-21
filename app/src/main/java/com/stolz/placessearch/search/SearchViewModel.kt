@@ -43,7 +43,7 @@ class SearchViewModel(private val favoritesDatabase: PlaceDao) : ViewModel() {
     private var searchJob = Job()
     private val searchScope = CoroutineScope(searchJob + Dispatchers.Main)
 
-    fun queryUpdated(query: String) {
+    fun updateQuery(query: String) {
         lastQuery = query
     }
 

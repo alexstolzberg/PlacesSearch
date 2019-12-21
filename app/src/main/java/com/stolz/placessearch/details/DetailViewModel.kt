@@ -1,5 +1,6 @@
 package com.stolz.placessearch.details
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
@@ -11,20 +12,27 @@ import com.stolz.placessearch.model.Place
 import com.stolz.placessearch.model.places.Venue
 import com.stolz.placessearch.network.FoursquareApi
 import com.stolz.placessearch.network.GoogleMapsApi
+import com.stolz.placessearch.util.SEATTLE_LATITUDE
+import com.stolz.placessearch.util.SEATTLE_LONGITUDE
+import com.stolz.placessearch.util.Utils
 import kotlinx.coroutines.*
+import okhttp3.ResponseBody
 import retrofit2.await
 import java.io.BufferedInputStream
 
 private val TAG = DetailViewModel::class.java.simpleName
 
-class DetailViewModel(private val favoritesDatabase: PlaceDao) : ViewModel() {
+class DetailViewModel(
+    private val context: Context,
+    private val favoritesDatabase: PlaceDao
+) : ViewModel() {
 
     // The detailed venue information
     private val _venueInformation = MutableLiveData<Venue>()
     val venueInformation: LiveData<Venue>
         get() = _venueInformation
 
-    // The detailed venue information
+    // The static map
     private val _staticMap = MutableLiveData<Bitmap>()
     val staticMap: LiveData<Bitmap>
         get() = _staticMap
@@ -42,23 +50,21 @@ class DetailViewModel(private val favoritesDatabase: PlaceDao) : ViewModel() {
     }
 
     private suspend fun fetchStaticMap(place: Place): Bitmap? {
-        //        val mapWidth = Resources.getSystem().displayMetrics.widthPixels
-        //        val mapHeight = 300 // TODO: ADD DIMEN
-        // TODO: PX TO DP
-
-        // FIXME: MARKER IS WRONG
-        val markerString = "color:red%7c" + place.location.latitude + "," + place.location.longitude
+        val centerMarkerString = Utils.generateStaticMarkerQueryParam(SEATTLE_LATITUDE, SEATTLE_LONGITUDE, Utils.MarkerColor.RED)
+        val placeMarkerString = Utils.generateStaticMarkerQueryParam(place.location.latitude, place.location.longitude, Utils.MarkerColor.GREEN)
 
         return withContext(Dispatchers.IO) {
             val staticMapDeferred =
-                GoogleMapsApi.retrofitService.getStaticMap(placeMarker = markerString)
+                GoogleMapsApi.retrofitService.getStaticMap(
+                    centerMarker = centerMarkerString,
+                    placeMarker = placeMarkerString,
+                    zoom = Utils.generateZoomLevel(place.distanceToCenter),
+                    size = Utils.generateStaticMapDimensions(context.resources)
+                )
             try {
                 val result = staticMapDeferred.await()
-                val inputStream = result.byteStream()
-                val bis = BufferedInputStream(inputStream)
-                val bitmap = BitmapFactory.decodeStream(bis)
                 Log.v(TAG, "Static map generated successfully")
-                bitmap
+                createBitmap(result)
             } catch (t: Throwable) {
                 Log.e(TAG, "Static map generation failed - ${t.message}")
                 null
@@ -103,6 +109,12 @@ class DetailViewModel(private val favoritesDatabase: PlaceDao) : ViewModel() {
                 }
             }
         }
+    }
+
+    private fun createBitmap(responseBody: ResponseBody): Bitmap {
+        val inputStream = responseBody.byteStream()
+        val bis = BufferedInputStream(inputStream)
+        return BitmapFactory.decodeStream(bis)
     }
 
     override fun onCleared() {

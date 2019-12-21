@@ -44,7 +44,7 @@ class DetailFragment : Fragment() {
         // Initialize ViewModel
         val context = requireNotNull(context)
         val favoritesDatabase = FavoriteDatabase.getInstance(context).placeDao()
-        val viewModelFactory = DetailViewModelFactory(favoritesDatabase)
+        val viewModelFactory = DetailViewModelFactory(context, favoritesDatabase)
         detailViewModel =
             ViewModelProviders.of(this, viewModelFactory).get(DetailViewModel::class.java)
         binding.viewModel = detailViewModel

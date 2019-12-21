@@ -18,7 +18,6 @@ import com.stolz.placessearch.database.FavoriteDatabase
 import com.stolz.placessearch.databinding.FragmentSearchBinding
 import com.stolz.placessearch.model.Place
 import com.stolz.placessearch.util.Utils
-import java.lang.reflect.Type
 
 private val TAG = SearchFragment::class.java.simpleName
 
@@ -81,7 +80,7 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClic
 
 
         binding.searchResultsList.adapter = SearchResultsAdapter(this)
-        searchViewModel.places.observe(this, Observer { placeResults->
+        searchViewModel.places.observe(this, Observer { placeResults ->
             if (placeResults.isEmpty()) {
                 binding.searchResultsList.visibility = View.GONE
                 Log.d(TAG, "Hiding place results list")
@@ -106,18 +105,14 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClic
     }
 
     override fun onSuggestionClicked(clickedSuggestion: String) {
-        searchViewModel.queryUpdated(clickedSuggestion)
+        searchViewModel.updateQuery(clickedSuggestion)
         binding.searchBar.setQuery(clickedSuggestion, true)
         binding.typeaheadResultsList.visibility = View.GONE
     }
 
     override fun onPlaceClicked(clickedPlace: Place) {
         view?.findNavController()
-            ?.navigate(
-                SearchFragmentDirections.actionSearchFragmentToDetailFragment(
-                    clickedPlace
-                )
-            )
+            ?.navigate(SearchFragmentDirections.actionSearchFragmentToDetailFragment(clickedPlace))
     }
 
     override fun onFavoriteClicked(clickedPlace: Place) {
