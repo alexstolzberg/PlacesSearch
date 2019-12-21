@@ -13,7 +13,6 @@ import com.stolz.placessearch.R
 
 private val TAG = TypeaheadResultsAdapter::class.java.simpleName
 
-// TODO: USE DAGGER?
 class TypeaheadResultsAdapter(private val itemClickedListener: TypeAheadSuggestionClickedListener) :
     ListAdapter<String, TypeaheadResultsAdapter.ViewHolder>(DiffCallback) {
 

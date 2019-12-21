@@ -15,12 +15,12 @@ class DatabaseModule {
     @Singleton
     internal fun provideFavoriteDatabase(application: Application): FavoriteDatabase {
         return Room.databaseBuilder(
-            application, FavoriteDatabase::class.java, "Favorites.db"
+            application.applicationContext,
+            FavoriteDatabase::class.java,
+            "favorites_database"
         )
-            .allowMainThreadQueries()
             .build()
     }
-
 
     @Provides
     @Singleton

@@ -10,6 +10,7 @@ import com.stolz.placessearch.model.Place
 import com.stolz.placessearch.model.places.Venue
 import com.stolz.placessearch.model.typeahead.Minivenue
 import com.stolz.placessearch.network.FoursquareApiService
+import com.stolz.placessearch.util.FOURSQUARE_MIN_QUERY_LENGTH
 import com.stolz.placessearch.util.NUM_METERS_PER_MILE
 import kotlinx.coroutines.*
 import java.text.DecimalFormat
@@ -61,7 +62,7 @@ class SearchViewModel @Inject constructor(
 
         lastQuery = query
 
-        if (query.length < FoursquareApiService.FOURSQUARE_MIN_QUERY_LENGTH) {
+        if (query.length < FOURSQUARE_MIN_QUERY_LENGTH) {
             Log.w(TAG, "Query is not long enough to get type ahead suggestions")
             _typeaheadResults.value = HashSet()
             return

@@ -2,6 +2,7 @@ package com.stolz.placessearch.network
 
 import com.stolz.placessearch.BuildConfig
 import com.stolz.placessearch.model.places.Object
+import com.stolz.placessearch.util.FOURSQUARE_DEFAULT_LIMIT
 import com.stolz.placessearch.util.SEATTLE_LATITUDE
 import com.stolz.placessearch.util.SEATTLE_LONGITUDE
 import com.stolz.placessearch.util.Utils
@@ -10,15 +11,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-private const val BASE_URL = "https://api.foursquare.com/v2/" // FIXME: WHERE SHOULD THIS GO -- CONSTANTS?
-private const val FOURSQUARE_DEFAULT_LIMIT = 50
-
-
 interface FoursquareApiService {
-
-    companion object {
-        const val FOURSQUARE_MIN_QUERY_LENGTH = 3
-    }
 
     @GET("venues/suggestcompletion")
     fun getTypeaheadResults(

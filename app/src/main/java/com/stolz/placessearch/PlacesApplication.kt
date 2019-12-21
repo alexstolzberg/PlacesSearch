@@ -2,7 +2,7 @@ package com.stolz.placessearch
 
 import android.app.Activity
 import android.app.Application
-import com.stolz.placessearch.dagger.module.DaggerAppComponent
+import com.stolz.placessearch.di.DaggerAppComponent
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
 import javax.inject.Inject

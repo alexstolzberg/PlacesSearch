@@ -4,6 +4,12 @@ package com.stolz.placessearch.util
 const val SEATTLE_LATITUDE = 47.6062
 const val SEATTLE_LONGITUDE = -122.3321
 
-const val NUM_METERS_PER_MILE = 1609.0
+// Foursquare
+const val FOURSQUARE_MIN_QUERY_LENGTH = 3
+const val FOURSQUARE_DEFAULT_LIMIT = 50 // the maximum number of results to fetch
 
+// Google Maps
 const val DEFAULT_ZOOM_LEVEL = 7
+
+// Conversions
+const val NUM_METERS_PER_MILE = 1609.0
