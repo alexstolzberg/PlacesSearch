@@ -27,6 +27,13 @@ class UtilsTest {
     }
 
     @Test
+    fun test_formatPhoneNumber_nonNumeric() {
+        val expected = ""
+        val result = Utils.formatPhoneNumber("abcd")
+        assertEquals("Output does not match", expected, result)
+    }
+
+    @Test
     fun test_formatPhoneNumber_wrongLength() {
         val expected = ""
         val result = Utils.formatPhoneNumber("123")
@@ -37,6 +44,13 @@ class UtilsTest {
     fun test_formatPhoneNumber_valid() {
         val expected = "123-456-7890"
         val result = Utils.formatPhoneNumber("1234567890")
+        assertEquals("Output does not match", expected, result)
+    }
+
+    @Test
+    fun test_formatPhoneNumber_alreadyFormatted() {
+        val expected = "123-456-7890"
+        val result = Utils.formatPhoneNumber("123-456-7890")
         assertEquals("Output does not match", expected, result)
     }
 

@@ -5,6 +5,7 @@ import android.content.res.Resources
 import android.util.DisplayMetrics
 import android.view.inputmethod.InputMethodManager
 import com.stolz.placessearch.R
+import java.lang.Long.parseLong
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
@@ -18,7 +19,11 @@ object Utils {
         GREEN("green")
     }
 
-    // TODO: JAVADOC
+    /**
+     * Hides the keyboard from the screen
+     *
+     * @param activity The current context
+     */
     fun hideSoftKeyboard(activity: Activity?) {
         if (activity == null) {
             return
@@ -39,13 +44,23 @@ object Utils {
         return formatter.format(currentDate)
     }
 
-    // TODO: JAVADOC
+    /**
+     * Creates a string representation of a lat/lng object to be used for the Foursquare API
+     *
+     * @param lat the latitude of the place being passed in
+     * @param lng the longitude of the place being passed in
+     * @return A string representation of the lat/lng in the format "lat,lng"
+     */
     fun generateStringFromLatLng(lat: Double, lng: Double): String {
         return "$lat,$lng"
     }
 
-
-    // TODO: JAVADOC
+    /**
+     * Generate appropriate dimensions for the static Google Map and return a string representation to be used in the query
+     *
+     * @param resources reference to Resources to allow for usage of dimens
+     * @return A string representation of the lat/lng in the format "WidthxHeight"
+     */
     fun generateStaticMapDimensions(resources: Resources): String {
         val mapWidth = pxToDp(resources, Resources.getSystem().displayMetrics.widthPixels)
         val mapHeight = pxToDp(resources, resources.getDimension(R.dimen.app_bar_height).toInt())
@@ -54,13 +69,38 @@ object Utils {
 
     /**
      * Formats the phone number properly to display in the UI
+     *
+     * @param phoneNumber A phone number passed in as a string in the format "1234567890"
+     * @return The formatted phone number in the format xxx-xxx-xxxx or "" if the format input was incorrect
      */
     fun formatPhoneNumber(phoneNumber: String?): String {
-        if (phoneNumber.isNullOrEmpty() || phoneNumber.length != 10) {
+        if (phoneNumber.isNullOrEmpty()) {
             return ""
         }
 
-        return phoneNumber.substring(0, 3)+ "-" + phoneNumber.substring(
+        try {
+            parseLong(phoneNumber)
+        } catch (e: NumberFormatException) {
+            // Check to see if the phone number is already formatted properly
+            if (phoneNumber.length == 12) {
+                val phoneNumberSplit = phoneNumber.split('-')
+                if (phoneNumberSplit.size == 3
+                    && phoneNumberSplit[0].length == 3
+                    && phoneNumberSplit[1].length == 3
+                    && phoneNumberSplit[2].length == 4
+                ) {
+                    // Phone number is already formatted
+                    return phoneNumber
+                }
+            }
+            return ""
+        }
+
+        if (phoneNumber.length != 10) {
+            return ""
+        }
+
+        return phoneNumber.substring(0, 3) + "-" + phoneNumber.substring(
             3, 6
         ) + "-" + phoneNumber.substring(6, 10)
     }
@@ -93,7 +133,14 @@ object Utils {
         return zoomLevel
     }
 
-    // TODO: JAVADOC
+    /**
+     * Generates a query param to add a marker tot he static Google Map API
+     *
+     * @param lat The latitude of the marker
+     * @param lon The longitude of the marker
+     * @param markerColor An enum object representing what color the marker should be
+     * @return A string query used to add a marker to the static Google Map
+     */
     fun generateStaticMarkerQueryParam(lat: Double, lon: Double, markerColor: MarkerColor): String {
         return STATIC_MAP_MARKER_FORMAT
             .replace("{COLOR}", markerColor.color)
@@ -103,6 +150,10 @@ object Utils {
 
     /**
      * A helper function to convert pixels to dp
+     *
+     * @param resources The resources object to get display metrics
+     * @param px The value of pixels to convert to dp
+     * @return The amount of dp
      */
     @JvmStatic
     fun pxToDp(resources: Resources, px: Int): Int =

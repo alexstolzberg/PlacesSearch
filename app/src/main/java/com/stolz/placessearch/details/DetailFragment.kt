@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.stolz.placessearch.R
 import com.stolz.placessearch.databinding.FragmentDetailBinding
 import com.stolz.placessearch.model.places.Venue
+import com.stolz.placessearch.util.TELEPHONE_PREFIX
 import com.stolz.placessearch.util.Utils
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -34,7 +35,8 @@ class DetailFragment : Fragment() {
         AndroidSupportInjection.inject(this)
 
         // Initialize ViewModel
-        detailViewModel = ViewModelProviders.of(this, viewModelFactory).get(DetailViewModel::class.java)
+        detailViewModel =
+            ViewModelProviders.of(this, viewModelFactory).get(DetailViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -69,7 +71,9 @@ class DetailFragment : Fragment() {
         }
 
         detailViewModel.venueInformation.observe(this, Observer {
-            updateContactInfo(it)
+            if (it != null) {
+                updateContactInfo(it)
+            }
         })
 
         detailViewModel.staticMap.observe(this, Observer {
@@ -82,14 +86,12 @@ class DetailFragment : Fragment() {
         return binding.root
     }
 
-    private fun updateContactInfo(venue: Venue?) {
-        // TODO: CLEAN THIS UP
-        venue?.contact?.let { contactInfo ->
+    private fun updateContactInfo(venue: Venue) {
+        venue.contact?.let { contactInfo ->
             if (contactInfo.phone != null && contactInfo.phone.isNotEmpty()) {
-                binding.contentDetails.phone.text =
-                    Utils.formatPhoneNumber(contactInfo.phone)
+                binding.contentDetails.phone.text = Utils.formatPhoneNumber(contactInfo.phone)
                 Linkify.addLinks(
-                    binding.contentDetails.phone, Patterns.PHONE, "tel:",
+                    binding.contentDetails.phone, Patterns.PHONE, TELEPHONE_PREFIX,
                     Linkify.sPhoneNumberMatchFilter, Linkify.sPhoneNumberTransformFilter
                 )
                 binding.contentDetails.phone.movementMethod = LinkMovementMethod.getInstance()
@@ -98,15 +100,13 @@ class DetailFragment : Fragment() {
             }
         }
 
-        venue?.url?.let { url ->
+        venue.url?.let { url ->
             if (url.isNotEmpty()) {
                 binding.contentDetails.website.text = url
                 binding.contentDetails.website.visibility = View.VISIBLE
                 binding.contentDetails.websiteTitle.visibility = View.VISIBLE
             }
         }
-
-        // TODO: Add more contact info
     }
 
     override fun onDestroy() {

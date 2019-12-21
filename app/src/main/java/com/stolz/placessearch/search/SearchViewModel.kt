@@ -8,7 +8,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.stolz.placessearch.database.PlaceDao
 import com.stolz.placessearch.model.Place
 import com.stolz.placessearch.model.places.Venue
-import com.stolz.placessearch.model.typeahead.Minivenue
 import com.stolz.placessearch.network.FoursquareApiService
 import com.stolz.placessearch.util.FOURSQUARE_MIN_QUERY_LENGTH
 import com.stolz.placessearch.util.NUM_METERS_PER_MILE
@@ -41,7 +40,6 @@ class SearchViewModel @Inject constructor(
     val places: LiveData<Set<Place>>
         get() = _places
 
-    // TODO: LiveData?
     private var lastQuery: String = ""
 
     private var searchJob = Job()
@@ -82,7 +80,8 @@ class SearchViewModel @Inject constructor(
                 val result = typeaheadResultsDeferred.await()
                 val minivenues = result.response.minivenues
                 Log.v(TAG, "Typeahead search successful - ${minivenues.size} results")
-                extractSuggestionsFromMinivenues(minivenues)
+                val suggestions: Set<String> = minivenues.map { it.name }.toSet()
+                suggestions
             } catch (t: Throwable) {
                 Log.e(TAG, "Typeahead search failed - ${t.message}")
                 HashSet<String>()
@@ -137,29 +136,11 @@ class SearchViewModel @Inject constructor(
     }
 
     /**
-     * This method takes the Minivenues model object and extracts type ahead suggestions from it to
-     * return to the caller
-     *
-     * @param minivenues The model object to extract results from
-     * @return A Set of type ahead search results (a Set is used to automatically handle duplicates)
-     */
-    // TODO: SEE IF THERE IS A WAY TO EASILY MAP THE OBJECTS
-    private fun extractSuggestionsFromMinivenues(minivenues: List<Minivenue>): Set<String> {
-        val typeAheadSuggestions = java.util.HashSet<String>()
-        for (minivenue in minivenues) {
-            val minivenueName = minivenue.name
-            typeAheadSuggestions.add(minivenueName)
-        }
-        return typeAheadSuggestions
-    }
-
-    /**
      * This method takes the Venues model object and extracts places from it to return to the caller
      *
      * @param venues The model object to extract results from
      * @return A Set of place results -- a Set is used to filter out duplicates automatically
      */
-    // TODO: SEE IF THERE IS A WAY TO EASILY MAP THE OBJECTS
     private fun extractPlacesFromVenues(venues: List<Venue>): Set<Place> {
         val places = HashSet<Place>()
         for (venue in venues) {

@@ -15,7 +15,7 @@ data class PlaceEntity(
     var name: String = "",
 
     @ColumnInfo(name = "category")
-    var category: String = "",
+    var category: String? = "",
 
     @ColumnInfo(name = "latitude")
     var latitude: Double = 0.0,

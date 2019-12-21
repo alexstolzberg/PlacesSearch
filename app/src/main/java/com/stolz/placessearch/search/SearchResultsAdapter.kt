@@ -44,7 +44,6 @@ class SearchResultsAdapter(private val listener: PlaceClickedListener) :
         val place = getItem(position)
 
         holder.rowLayout.setOnClickListener {
-            // TODO: IS THERE A BETTER WAY TO SEND THIS INFORMATION?
             Log.d(TAG, "Place result clicked: ${holder.name}")
             listener.onPlaceClicked(place)
         }

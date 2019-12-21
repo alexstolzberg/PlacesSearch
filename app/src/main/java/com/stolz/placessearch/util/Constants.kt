@@ -16,3 +16,6 @@ const val DEFAULT_ZOOM_LEVEL = 7
 
 // Conversions
 const val NUM_METERS_PER_MILE = 1609.0
+
+// General
+const val TELEPHONE_PREFIX = "tel:"

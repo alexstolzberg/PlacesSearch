@@ -39,7 +39,6 @@ class TypeaheadResultsAdapter(private val itemClickedListener: TypeAheadSuggesti
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val typeaheadResult = getItem(position)
         holder.rowLayout.setOnClickListener {
-            // TODO: IS THERE A BETTER WAY TO SEND THIS INFORMATION?
             Log.d(TAG, "Typeahead result clicked: ${holder.name}")
             itemClickedListener.onSuggestionClicked(typeaheadResult)
         }
