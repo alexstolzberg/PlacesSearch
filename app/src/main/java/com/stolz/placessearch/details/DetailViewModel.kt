@@ -70,7 +70,7 @@ class DetailViewModel @Inject constructor(
                     centerMarker = centerMarkerString,
                     placeMarker = placeMarkerString,
                     zoom = Utils.generateZoomLevel(place.distanceToCenter),
-                    size = Utils.generateStaticMapDimensions(context.resources) // FIXME: INJECT CONTEXT
+                    size = Utils.generateStaticMapDimensions(context.resources)
                 )
             try {
                 val result = staticMapDeferred.await()
