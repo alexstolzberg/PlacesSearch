@@ -1,6 +1,7 @@
 package com.stolz.placessearch.network
 
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
+import com.stolz.placessearch.BuildConfig
 import com.stolz.placessearch.util.DEFAULT_ZOOM_LEVEL
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -10,9 +11,6 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 private const val BASE_URL = "https://maps.googleapis.com/maps/api/"
-
-// TODO: MOVE THIS TO A MORE SECURE PLACE
-private const val GOOGLE_MAPS_KEY = "AIzaSyDtOKOqWrTMcctBzkECJzwKPRXJt2LLClw"
 
 private val retrofit = Retrofit.Builder()
     .addConverterFactory(ScalarsConverterFactory.create())
@@ -30,7 +28,7 @@ interface GoogleMapsApiService {
         @Query("mapType") mapType: String = "roadmap",
         @Query("markers", encoded = true) centerMarker: String = "",
         @Query("markers", encoded = true) placeMarker: String = "",
-        @Query("key") key: String = GOOGLE_MAPS_KEY
+        @Query("key") key: String = BuildConfig.GOOGLE_MAPS_API_KEY
     ): Call<ResponseBody>
 }
 

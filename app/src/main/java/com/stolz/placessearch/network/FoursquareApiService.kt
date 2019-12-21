@@ -3,6 +3,7 @@ package com.stolz.placessearch.network
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.stolz.placessearch.BuildConfig
 import com.stolz.placessearch.model.places.Object
 import com.stolz.placessearch.util.SEATTLE_LATITUDE
 import com.stolz.placessearch.util.SEATTLE_LONGITUDE
@@ -16,10 +17,6 @@ import retrofit2.http.Query
 
 private const val BASE_URL = "https://api.foursquare.com/v2/"
 private const val FOURSQUARE_DEFAULT_LIMIT = 50
-
-// TODO: MOVE THESE TO A MORE SECURE PLACE
-private const val CLIENT_ID = "WD3UQZ03SJ4VDZSDEWXBHPSOHZSNRGQIBAEY3Q0UGWPXXYJH"
-private const val CLIENT_SECRET = "L2NUD1USBGSCRLZF1WVA4PEE0VD2PPAR01RF3IJ5QB4BABCD"
 
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
@@ -39,8 +36,8 @@ interface FoursquareApiService {
 
     @GET("venues/suggestcompletion")
     fun getTypeaheadResults(
-        @Query("client_id") clientId: String = CLIENT_ID,
-        @Query("client_secret") clientSecret: String = CLIENT_SECRET,
+        @Query("client_id") clientId: String = BuildConfig.FOURSQUARE_CLIENT_ID,
+        @Query("client_secret") clientSecret: String = BuildConfig.FOURSQUARE_CLIENT_SECRET,
         @Query("ll") latLng: String = Utils.generateStringFromLatLng(
             SEATTLE_LATITUDE,
             SEATTLE_LONGITUDE
@@ -52,8 +49,8 @@ interface FoursquareApiService {
 
     @GET("venues/search")
     fun getPlaces(
-        @Query("client_id") clientId: String = CLIENT_ID,
-        @Query("client_secret") clientSecret: String = CLIENT_SECRET,
+        @Query("client_id") clientId: String = BuildConfig.FOURSQUARE_CLIENT_ID,
+        @Query("client_secret") clientSecret: String = BuildConfig.FOURSQUARE_CLIENT_SECRET,
         @Query("ll") latLng: String = Utils.generateStringFromLatLng(
             SEATTLE_LATITUDE,
             SEATTLE_LONGITUDE
@@ -66,8 +63,8 @@ interface FoursquareApiService {
     @GET("venues/{venueId}")
     fun getVenueDetails(
         @Path("venueId") venueId: String,
-        @Query("client_id") clientId: String = CLIENT_ID,
-        @Query("client_secret") clientSecret: String = CLIENT_SECRET,
+        @Query("client_id") clientId: String = BuildConfig.FOURSQUARE_CLIENT_ID,
+        @Query("client_secret") clientSecret: String = BuildConfig.FOURSQUARE_CLIENT_SECRET,
         @Query("v") timestamp: String = Utils.generateDateString()
     ): Deferred<com.stolz.placessearch.model.venue_information.Object>
 }
