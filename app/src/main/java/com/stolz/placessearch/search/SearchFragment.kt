@@ -10,21 +10,35 @@ import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.stolz.placessearch.R
-import com.stolz.placessearch.database.FavoriteDatabase
 import com.stolz.placessearch.databinding.FragmentSearchBinding
 import com.stolz.placessearch.model.Place
 import com.stolz.placessearch.util.Utils
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
 private val TAG = SearchFragment::class.java.simpleName
 
 class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClickedListener {
 
+    @Inject
+    internal lateinit var viewModelFactory: ViewModelProvider.Factory
+
     private lateinit var binding: FragmentSearchBinding
     private lateinit var searchViewModel: SearchViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        AndroidSupportInjection.inject(this)
+
+        // Initialize ViewModel
+        searchViewModel =
+            ViewModelProviders.of(this, viewModelFactory).get(SearchViewModel::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,16 +50,9 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClic
             R.layout.fragment_search, container, false
         )
         binding.lifecycleOwner = this
+        binding.viewModel = searchViewModel
 
         (activity as AppCompatActivity).supportActionBar?.show()
-
-        // Initialize ViewModel
-        val context = requireNotNull(context)
-        val favoritesDatabase = FavoriteDatabase.getInstance(context).placeDao()
-        val viewModelFactory = SearchViewModelFactory(favoritesDatabase)
-        searchViewModel =
-            ViewModelProviders.of(this, viewModelFactory).get(SearchViewModel::class.java)
-        binding.viewModel = searchViewModel
 
         binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {

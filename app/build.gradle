@@ -27,6 +27,11 @@ android {
         buildConfigField("String", "FOURSQUARE_CLIENT_SECRET", apikeyProperties['FOURSQUARE_CLIENT_SECRET'])
         buildConfigField("String", "GOOGLE_MAPS_API_KEY", apikeyProperties['GOOGLE_MAPS_API_KEY'])
     }
+
+    kapt {
+        generateStubs = true
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -89,8 +94,10 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
 
     // Dagger
-    implementation "com.google.dagger:dagger:2.25.3"
-    kapt "com.google.dagger:dagger-compiler:2.25.3"
+    implementation 'com.google.dagger:dagger-android:2.16'
+    implementation 'com.google.dagger:dagger-android-support:2.16'
+    kapt 'com.google.dagger:dagger-android-processor:2.16'
+    kapt 'com.google.dagger:dagger-compiler:2.16'
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.12'

@@ -10,8 +10,8 @@ import androidx.lifecycle.ViewModel
 import com.stolz.placessearch.database.PlaceDao
 import com.stolz.placessearch.model.Place
 import com.stolz.placessearch.model.places.Venue
-import com.stolz.placessearch.network.FoursquareApi
-import com.stolz.placessearch.network.GoogleMapsApi
+import com.stolz.placessearch.network.FoursquareApiService
+import com.stolz.placessearch.network.GoogleMapsApiService
 import com.stolz.placessearch.util.SEATTLE_LATITUDE
 import com.stolz.placessearch.util.SEATTLE_LONGITUDE
 import com.stolz.placessearch.util.Utils
@@ -19,12 +19,15 @@ import kotlinx.coroutines.*
 import okhttp3.ResponseBody
 import retrofit2.await
 import java.io.BufferedInputStream
+import javax.inject.Inject
 
 private val TAG = DetailViewModel::class.java.simpleName
 
-class DetailViewModel(
+class DetailViewModel @Inject constructor(
     private val context: Context,
-    private val favoritesDatabase: PlaceDao
+    private val favoritesDatabase: PlaceDao,
+    private val foursquareApiService: FoursquareApiService,
+    private val googleMapsApiService: GoogleMapsApiService
 ) : ViewModel() {
 
     // The detailed venue information
@@ -40,7 +43,7 @@ class DetailViewModel(
     private var detailsJob = Job()
     private val detailsScope = CoroutineScope(detailsJob + Dispatchers.Main)
 
-    fun getStaticMap(place: Place) { // TODO: DAGGER IN CONTEXT
+    fun getStaticMap(place: Place) {
         detailsScope.launch {
             val bitmap = fetchStaticMap(place)
             if (bitmap != null) {
@@ -50,16 +53,24 @@ class DetailViewModel(
     }
 
     private suspend fun fetchStaticMap(place: Place): Bitmap? {
-        val centerMarkerString = Utils.generateStaticMarkerQueryParam(SEATTLE_LATITUDE, SEATTLE_LONGITUDE, Utils.MarkerColor.RED)
-        val placeMarkerString = Utils.generateStaticMarkerQueryParam(place.location.latitude, place.location.longitude, Utils.MarkerColor.GREEN)
+        val centerMarkerString = Utils.generateStaticMarkerQueryParam(
+            SEATTLE_LATITUDE,
+            SEATTLE_LONGITUDE,
+            Utils.MarkerColor.RED
+        )
+        val placeMarkerString = Utils.generateStaticMarkerQueryParam(
+            place.location.latitude,
+            place.location.longitude,
+            Utils.MarkerColor.GREEN
+        )
 
         return withContext(Dispatchers.IO) {
             val staticMapDeferred =
-                GoogleMapsApi.retrofitService.getStaticMap(
+                googleMapsApiService.getStaticMap(
                     centerMarker = centerMarkerString,
                     placeMarker = placeMarkerString,
                     zoom = Utils.generateZoomLevel(place.distanceToCenter),
-                    size = Utils.generateStaticMapDimensions(context.resources)
+                    size = Utils.generateStaticMapDimensions(context.resources) // FIXME: INJECT CONTEXT
                 )
             try {
                 val result = staticMapDeferred.await()
@@ -84,7 +95,7 @@ class DetailViewModel(
     private suspend fun fetchVenueInformation(venueId: String): Venue? {
         return withContext(Dispatchers.IO) {
             val venueInformationDeferred =
-                FoursquareApi.retrofitService.getVenueDetails(venueId = venueId)
+                foursquareApiService.getVenueDetails(venueId = venueId)
             try {
                 val venueDeferred = venueInformationDeferred.await()
                 Log.v(TAG, "Got venue information successfully")

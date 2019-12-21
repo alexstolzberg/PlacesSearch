@@ -9,15 +9,18 @@ import com.stolz.placessearch.database.PlaceDao
 import com.stolz.placessearch.model.Place
 import com.stolz.placessearch.model.places.Venue
 import com.stolz.placessearch.model.typeahead.Minivenue
-import com.stolz.placessearch.network.FoursquareApi
 import com.stolz.placessearch.network.FoursquareApiService
 import com.stolz.placessearch.util.NUM_METERS_PER_MILE
 import kotlinx.coroutines.*
 import java.text.DecimalFormat
+import javax.inject.Inject
 
 private val TAG = SearchViewModel::class.java.simpleName
 
-class SearchViewModel(private val favoritesDatabase: PlaceDao) : ViewModel() {
+class SearchViewModel @Inject constructor(
+    private val favoritesDatabase: PlaceDao,
+    private val foursquareApiService: FoursquareApiService
+) : ViewModel() {
 
     enum class SearchStatus { LOADING, ERROR, DONE, EMPTY }
 
@@ -72,7 +75,7 @@ class SearchViewModel(private val favoritesDatabase: PlaceDao) : ViewModel() {
     private suspend fun fetchTypeaheadResults(query: String): Set<String> {
         return withContext(Dispatchers.IO) {
             try {
-                val typeaheadResultsDeferred = FoursquareApi.retrofitService.getTypeaheadResults(
+                val typeaheadResultsDeferred = foursquareApiService.getTypeaheadResults(
                     query = query
                 )
                 val result = typeaheadResultsDeferred.await()
@@ -100,7 +103,7 @@ class SearchViewModel(private val favoritesDatabase: PlaceDao) : ViewModel() {
 
     private suspend fun fetchPlaces(query: String): Set<Place> {
         return withContext(Dispatchers.IO) {
-            val searchPlacesDeferred = FoursquareApi.retrofitService.getPlaces(query = query)
+            val searchPlacesDeferred = foursquareApiService.getPlaces(query = query)
             try {
                 val result = searchPlacesDeferred.await()
                 val venues = result.response.venues

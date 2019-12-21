@@ -12,17 +12,30 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.stolz.placessearch.R
-import com.stolz.placessearch.database.FavoriteDatabase
 import com.stolz.placessearch.databinding.FragmentDetailBinding
 import com.stolz.placessearch.model.places.Venue
 import com.stolz.placessearch.util.Utils
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
 class DetailFragment : Fragment() {
 
+    @Inject
+    internal lateinit var viewModelFactory: ViewModelProvider.Factory
+
     private lateinit var binding: FragmentDetailBinding
     private lateinit var detailViewModel: DetailViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        AndroidSupportInjection.inject(this)
+
+        // Initialize ViewModel
+        detailViewModel = ViewModelProviders.of(this, viewModelFactory).get(DetailViewModel::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,6 +46,7 @@ class DetailFragment : Fragment() {
             R.layout.fragment_detail, container, false
         )
         binding.lifecycleOwner = this
+        binding.viewModel = detailViewModel
 
         // TODO: Should we show and hide the action bar
         (activity as AppCompatActivity).supportActionBar?.hide()
@@ -40,14 +54,6 @@ class DetailFragment : Fragment() {
         val args = arguments ?: return null
         val safeArgs = DetailFragmentArgs.fromBundle(args)
         val place = safeArgs.place
-
-        // Initialize ViewModel
-        val context = requireNotNull(context)
-        val favoritesDatabase = FavoriteDatabase.getInstance(context).placeDao()
-        val viewModelFactory = DetailViewModelFactory(context, favoritesDatabase)
-        detailViewModel =
-            ViewModelProviders.of(this, viewModelFactory).get(DetailViewModel::class.java)
-        binding.viewModel = detailViewModel
 
         binding.contentDetails.name.text = place.name
         binding.contentDetails.category.text = place.category
