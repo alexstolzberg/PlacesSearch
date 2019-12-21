@@ -69,8 +69,7 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClic
             }
         })
 
-        binding.typeaheadResultsList.adapter =
-            TypeaheadResultsAdapter(this)
+        binding.typeaheadResultsList.adapter = TypeaheadResultsAdapter(this)
         binding.typeaheadResultsList.addItemDecoration(
             DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
         )

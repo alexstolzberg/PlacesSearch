@@ -44,7 +44,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         )
         binding.lifecycleOwner = this
 
-        // TODO: Should we show and hide the action bar
         (activity as AppCompatActivity).supportActionBar?.hide()
 
         val args = arguments ?: return null

@@ -5,6 +5,8 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.stolz.placessearch.network.FoursquareApiService
 import com.stolz.placessearch.network.GoogleMapsApiService
+import com.stolz.placessearch.util.FOURSQUARE_BASE_URL
+import com.stolz.placessearch.util.GOOGLE_BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
@@ -12,9 +14,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import javax.inject.Named
-
-private const val GOOGLE_BASE_URL = "https://maps.googleapis.com/maps/api/"
-private const val FOURSQUARE_BASE_URL = "https://api.foursquare.com/v2/"
 
 @Module
 class NetworkModule {

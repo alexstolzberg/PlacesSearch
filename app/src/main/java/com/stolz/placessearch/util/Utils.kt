@@ -3,14 +3,11 @@ package com.stolz.placessearch.util
 import android.app.Activity
 import android.content.res.Resources
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import com.stolz.placessearch.R
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.roundToInt
-
-private val TAG = Utils::class.java.simpleName
 
 private const val STATIC_MAP_MARKER_FORMAT = "color:{COLOR}%7c{LATITUDE},{LONGITUDE}"
 
@@ -19,6 +16,16 @@ object Utils {
     enum class MarkerColor(val color: String) {
         RED("red"),
         GREEN("green")
+    }
+
+    // TODO: JAVADOC
+    fun hideSoftKeyboard(activity: Activity?) {
+        if (activity == null) {
+            return
+        }
+        val inputMethodManager =
+            activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(activity.currentFocus?.windowToken, 0)
     }
 
     /**
@@ -45,16 +52,6 @@ object Utils {
         return mapWidth.toString() + "x" + mapHeight.toString()
     }
 
-    // TODO: JAVADOC
-    fun hideSoftKeyboard(activity: Activity?) {
-        if (activity == null) {
-            return
-        }
-        val inputMethodManager =
-            activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(activity.currentFocus?.windowToken, 0)
-    }
-
     /**
      * Formats the phone number properly to display in the UI
      */
@@ -63,9 +60,8 @@ object Utils {
             return ""
         }
 
-        return phoneNumber.substring(0, 3) + "-" + phoneNumber.substring(
-            3,
-            6
+        return phoneNumber.substring(0, 3)+ "-" + phoneNumber.substring(
+            3, 6
         ) + "-" + phoneNumber.substring(6, 10)
     }
 
@@ -94,13 +90,10 @@ object Utils {
             zoomLevel = 8
         }
 
-        Log.d(
-            TAG,
-            "generateZoomLevel -- Distance from center: $distanceFromCenter / Zoom Level: $zoomLevel"
-        )
         return zoomLevel
     }
 
+    // TODO: JAVADOC
     fun generateStaticMarkerQueryParam(lat: Double, lon: Double, markerColor: MarkerColor): String {
         return STATIC_MAP_MARKER_FORMAT
             .replace("{COLOR}", markerColor.color)

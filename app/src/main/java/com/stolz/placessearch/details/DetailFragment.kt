@@ -48,7 +48,6 @@ class DetailFragment : Fragment() {
         binding.lifecycleOwner = this
         binding.viewModel = detailViewModel
 
-        // TODO: Should we show and hide the action bar
         (activity as AppCompatActivity).supportActionBar?.hide()
 
         val args = arguments ?: return null
@@ -112,7 +111,6 @@ class DetailFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // TODO: Should we show and hide the action bar
         (activity as AppCompatActivity).supportActionBar?.show()
     }
 }
