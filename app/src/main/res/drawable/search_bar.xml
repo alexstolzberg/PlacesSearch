@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#e7e8eb" />
+    <solid android:color="@color/search_bar_background" />
     <stroke
         android:width="3dp"
-        android:color="#e7e8eb" />
+        android:color="@color/search_bar_background" />
     <corners android:radius="35dp" />
     <padding
         android:bottom="5dp"

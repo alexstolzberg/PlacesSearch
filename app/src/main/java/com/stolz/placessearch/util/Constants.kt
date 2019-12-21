@@ -6,7 +6,8 @@ const val SEATTLE_LONGITUDE = -122.3321
 
 // Foursquare
 const val FOURSQUARE_MIN_QUERY_LENGTH = 3
-const val FOURSQUARE_DEFAULT_LIMIT = 50 // the maximum number of results to fetch
+const val FOURSQUARE_MAX_PLACE_RESULTS_LIMIT = 50 // the maximum number of results to fetch
+const val FOURSQUARE_MAX_TYPEAHEAD_RESULTS_LIMIT = 7 // the maximum number of results to fetch
 
 // Google Maps
 const val DEFAULT_ZOOM_LEVEL = 7

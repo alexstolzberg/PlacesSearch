@@ -54,8 +54,8 @@ class SearchResultsAdapter(private val listener: PlaceClickedListener) :
             .load(place.iconUrl)
             .apply(
                 RequestOptions()
-                    .placeholder(R.drawable.loading_spinner)
-                    .error(R.drawable.ic_connection_error)
+                    .placeholder(R.drawable.ic_loading)
+                    .error(R.drawable.ic_broken_image)
             )
             .into(holder.icon)
         holder.category.text = place.category

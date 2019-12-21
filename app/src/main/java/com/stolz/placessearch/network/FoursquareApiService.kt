@@ -2,10 +2,7 @@ package com.stolz.placessearch.network
 
 import com.stolz.placessearch.BuildConfig
 import com.stolz.placessearch.model.places.Object
-import com.stolz.placessearch.util.FOURSQUARE_DEFAULT_LIMIT
-import com.stolz.placessearch.util.SEATTLE_LATITUDE
-import com.stolz.placessearch.util.SEATTLE_LONGITUDE
-import com.stolz.placessearch.util.Utils
+import com.stolz.placessearch.util.*
 import kotlinx.coroutines.Deferred
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -21,7 +18,7 @@ interface FoursquareApiService {
             SEATTLE_LATITUDE,
             SEATTLE_LONGITUDE
         ),
-        @Query("limit") limit: String = FOURSQUARE_DEFAULT_LIMIT.toString(),
+        @Query("limit") limit: String = FOURSQUARE_MAX_TYPEAHEAD_RESULTS_LIMIT.toString(),
         @Query("query") query: String,
         @Query("v") timestamp: String = Utils.generateDateString()
     ): Deferred<com.stolz.placessearch.model.typeahead.Object>
@@ -34,7 +31,7 @@ interface FoursquareApiService {
             SEATTLE_LATITUDE,
             SEATTLE_LONGITUDE
         ),
-        @Query("limit") limit: String = FOURSQUARE_DEFAULT_LIMIT.toString(),
+        @Query("limit") limit: String = FOURSQUARE_MAX_PLACE_RESULTS_LIMIT.toString(),
         @Query("query") query: String,
         @Query("v") timestamp: String = Utils.generateDateString()
     ): Deferred<Object>
