@@ -1,6 +1,9 @@
 package com.stolz.placessearch.model.places
 
 import com.squareup.moshi.JsonClass
+import com.stolz.placessearch.model.Category
+import com.stolz.placessearch.model.Contact
+import com.stolz.placessearch.model.Location
 
 @JsonClass(generateAdapter = true)
 data class Venue(val id: String = "",

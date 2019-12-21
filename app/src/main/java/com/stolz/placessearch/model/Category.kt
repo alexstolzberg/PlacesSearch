@@ -1,4 +1,4 @@
-package com.stolz.placessearch.model.typeahead
+package com.stolz.placessearch.model
 
 import com.squareup.moshi.JsonClass
 
