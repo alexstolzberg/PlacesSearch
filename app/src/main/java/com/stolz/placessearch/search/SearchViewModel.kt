@@ -96,13 +96,18 @@ class SearchViewModel @Inject constructor(
         searchScope.launch {
             _status.value = SearchStatus.LOADING
             val results = fetchPlaces(query)
-            _places.value = results
-            _status.value = if (results.isEmpty()) SearchStatus.EMPTY else SearchStatus.DONE
 
+            if (results == null) {
+                _status.value = SearchStatus.ERROR
+                _places.value = HashSet()
+            } else {
+                _places.value = results
+                _status.value = if (results.isEmpty()) SearchStatus.EMPTY else SearchStatus.DONE
+            }
         }
     }
 
-    private suspend fun fetchPlaces(query: String): Set<Place> {
+    private suspend fun fetchPlaces(query: String): Set<Place>? {
         return withContext(Dispatchers.IO) {
             val searchPlacesDeferred = foursquareApiService.getPlaces(query = query)
             try {
@@ -112,7 +117,7 @@ class SearchViewModel @Inject constructor(
                 extractPlacesFromVenues(venues)
             } catch (t: Throwable) {
                 Log.e(TAG, "Places search failed - ${t.message}")
-                HashSet<Place>()
+                null
             }
         }
     }
@@ -126,7 +131,6 @@ class SearchViewModel @Inject constructor(
                     favoritesDatabase.insert(placeEntity)
                 } else {
                     favoritesDatabase.updatePlace(placeEntity)
-
                 }
             }
         }

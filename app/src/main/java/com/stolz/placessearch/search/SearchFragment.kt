@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
+import com.google.android.material.snackbar.Snackbar
 import com.stolz.placessearch.R
 import com.stolz.placessearch.databinding.FragmentSearchBinding
 import com.stolz.placessearch.model.Place
@@ -107,6 +108,13 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClic
                     )
                 )
         }
+
+        searchViewModel.status.observe(this, Observer {
+            if (it == SearchViewModel.SearchStatus.ERROR) {
+                Snackbar.make(binding.parentLayout, "No Internet Connection", Snackbar.LENGTH_LONG)
+                    .show()
+            }
+        })
 
         return binding.root
     }
