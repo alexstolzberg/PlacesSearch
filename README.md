@@ -67,7 +67,7 @@ These keys are currently located in the `app_config.xml` file. Once these keys a
 
 ## Roadmap/Future Improvements
 * Add additional unit tests for ViewModel and Repository classes
-* Add UI tests with Espresso to test UI functionality
+* Add additional Espresso tests and integrate MockWebServer to fake API responses
 * Include support for other cities
 * Implement a retry mechanism for failed API calls (i.e exponential backoff)
 * UI and style improvements
