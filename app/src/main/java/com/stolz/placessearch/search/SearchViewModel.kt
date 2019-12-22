@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.stolz.placessearch.database.PlaceDao
 import com.stolz.placessearch.model.Place
-import com.stolz.placessearch.network.FoursquareApiService
 import com.stolz.placessearch.util.FOURSQUARE_MIN_QUERY_LENGTH
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -15,7 +14,7 @@ private val TAG = SearchViewModel::class.java.simpleName
 
 class SearchViewModel @Inject constructor(
     private val favoritesDatabase: PlaceDao,
-    foursquareApiService: FoursquareApiService
+    private val searchRepository: SearchRepository
 ) : ViewModel() {
 
     enum class SearchStatus { LOADING, ERROR, DONE, EMPTY }
@@ -40,13 +39,6 @@ class SearchViewModel @Inject constructor(
 
     private var searchJob = Job()
     private val searchScope = CoroutineScope(searchJob + Dispatchers.Main)
-
-    private val searchRepository = SearchRepository.getInstance()
-
-    init{
-        searchRepository.foursquareApiService = foursquareApiService
-        searchRepository.favoritesDatabase = favoritesDatabase
-    }
 
     fun getTypeaheadResults(query: String) {
         Log.v(TAG, "Getting typeahead results for query: \"${query}\"")

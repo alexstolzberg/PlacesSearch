@@ -10,30 +10,14 @@ import com.stolz.placessearch.util.NUM_METERS_PER_MILE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.DecimalFormat
+import javax.inject.Inject
 
 private val TAG = SearchRepository::class.java.simpleName
 
-class SearchRepository {
-
-    lateinit var foursquareApiService: FoursquareApiService
-    lateinit var favoritesDatabase: PlaceDao
-
-    companion object {
-        @Volatile
-        private var INSTANCE: SearchRepository? = null
-
-        fun getInstance(): SearchRepository {
-            synchronized(this) {
-                var instance = INSTANCE
-
-                if (instance == null) {
-                    instance = SearchRepository()
-                    INSTANCE = instance
-                }
-                return instance
-            }
-        }
-    }
+class SearchRepository @Inject constructor(
+    private val foursquareApiService: FoursquareApiService,
+    private val favoritesDatabase: PlaceDao
+) {
 
     suspend fun fetchTypeaheadResults(query: String): Set<String> {
         return withContext(Dispatchers.IO) {

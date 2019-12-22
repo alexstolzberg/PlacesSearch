@@ -7,12 +7,12 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 class Place(
-    val id: String,
-    val name: String,
-    val category: String?,
-    val address: String?,
+    val id: String = "",
+    val name: String = "",
+    val category: String? = null,
+    val address: String? = null,
     val location: LatLng,
-    val distanceToCenter: Double,
+    val distanceToCenter: Double = 0.0,
     val iconUrl: String? = "",
     var isFavorite: Boolean = false
 ) : Parcelable {

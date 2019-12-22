@@ -16,29 +16,14 @@ import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import retrofit2.await
 import java.io.BufferedInputStream
+import javax.inject.Inject
 
 private val TAG = DetailRepository::class.java.simpleName
 
-class DetailRepository {
-    lateinit var foursquareApiService: FoursquareApiService
-    lateinit var googleMapsApiService: GoogleMapsApiService
-
-    companion object {
-        @Volatile
-        private var INSTANCE: DetailRepository? = null
-
-        fun getInstance(): DetailRepository {
-            synchronized(this) {
-                var instance = INSTANCE
-
-                if (instance == null) {
-                    instance = DetailRepository()
-                    INSTANCE = instance
-                }
-                return instance
-            }
-        }
-    }
+class DetailRepository @Inject constructor(
+    private val foursquareApiService: FoursquareApiService,
+    private val googleMapsApiService: GoogleMapsApiService
+) {
 
     suspend fun fetchStaticMap(context: Context, place: Place): Bitmap? {
         val centerMarkerString = Utils.generateStaticMarkerQueryParam(
@@ -91,5 +76,4 @@ class DetailRepository {
         val bis = BufferedInputStream(inputStream)
         return BitmapFactory.decodeStream(bis)
     }
-
 }

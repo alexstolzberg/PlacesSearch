@@ -8,16 +8,13 @@ import androidx.lifecycle.ViewModel
 import com.stolz.placessearch.database.PlaceDao
 import com.stolz.placessearch.model.Place
 import com.stolz.placessearch.model.places.Venue
-import com.stolz.placessearch.network.FoursquareApiService
-import com.stolz.placessearch.network.GoogleMapsApiService
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
 class DetailViewModel @Inject constructor(
     private val context: Context,
     private val favoritesDatabase: PlaceDao,
-    foursquareApiService: FoursquareApiService,
-    googleMapsApiService: GoogleMapsApiService
+    private val detailRepository: DetailRepository
 ) : ViewModel() {
 
     // LiveData containing detailed venue information
@@ -32,13 +29,6 @@ class DetailViewModel @Inject constructor(
 
     private var detailsJob = Job()
     private val detailsScope = CoroutineScope(detailsJob + Dispatchers.Main)
-
-    private val detailRepository = DetailRepository.getInstance()
-
-    init {
-        detailRepository.foursquareApiService = foursquareApiService
-        detailRepository.googleMapsApiService = googleMapsApiService
-    }
 
     fun getStaticMap(place: Place) {
         detailsScope.launch {
