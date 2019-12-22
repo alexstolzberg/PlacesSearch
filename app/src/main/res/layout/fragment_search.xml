@@ -17,9 +17,12 @@
         android:layout_height="match_parent">
 
         <androidx.appcompat.widget.SearchView
-            android:id="@+id/search_bar"
+            android:id="@+id/results_search_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:iconifiedByDefault="false"
+            android:clickable="true"
+            android:focusable="true"
             android:layout_marginTop="8dp"
             android:background="@drawable/search_bar"
             app:layout_constraintEnd_toEndOf="parent"
@@ -37,7 +40,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/search_bar"
+            app:layout_constraintTop_toBottomOf="@+id/results_search_bar"
             tools:itemCount="16"
             tools:listitem="@layout/row_place_search_result" />
 
@@ -55,7 +58,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/search_bar"
+            app:layout_constraintTop_toBottomOf="@+id/results_search_bar"
             tools:itemCount="16"
             tools:listitem="@layout/row_place_search_result" />
 

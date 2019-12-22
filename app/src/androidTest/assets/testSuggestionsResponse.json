@@ -1,0 +1,129 @@
+{
+	"meta": {
+		"code": 200,
+		"requestId": "5b564f3e6a607161ed6e9634"
+	},
+	"response": {
+		"minivenues": [{
+			"id": "49d3e558f964a520225c1fe3",
+			"name": "Cherry Street Coffee House",
+			"location": {
+				"address": "103 Cherry St",
+				"crossStreet": "at 1st Ave",
+				"city": "Seattle",
+				"state": "WA",
+				"postalCode": "98104",
+				"country": "US",
+				"lat": 47.6027673646861,
+				"lng": -122.33415097514295,
+				"distance": 411
+			},
+			"categories": [{
+				"id": "4bf58dd8d48988d1e0931735",
+				"name": "Coffee Shop",
+				"pluralName": "Coffee Shops",
+				"shortName": "Coffee Shop",
+				"icon": {
+					"prefix": "https:\/\/ss3.4sqi.net\/img\/categories_v2\/food\/coffeeshop_",
+					"suffix": ".png"
+				}
+			}, {
+				"id": "4bf58dd8d48988d16d941735",
+				"name": "Café",
+				"pluralName": "Cafés",
+				"shortName": "Café",
+				"icon": {
+					"prefix": "https:\/\/ss3.4sqi.net\/img\/categories_v2\/food\/cafe_",
+					"suffix": ".png"
+				}
+			}, {
+				"id": "4d4b7105d754a06374d81259",
+				"name": "Food",
+				"pluralName": "Food",
+				"shortName": "Food",
+				"icon": {
+					"prefix": "https:\/\/ss3.4sqi.net\/img\/categories_v2\/food\/default_",
+					"suffix": ".png"
+				}
+			}],
+			"hasPerk": false
+		}, {
+			"id": "52d456c811d24128cdd7bc8b",
+			"name": "Storyville Coffee Company",
+			"location": {
+				"address": "1001 1st Ave",
+				"crossStreet": "at Madison St",
+				"city": "Seattle",
+				"state": "WA",
+				"postalCode": "98104",
+				"country": "US",
+				"lat": 47.604759229857436,
+				"lng": -122.33636209698689,
+				"distance": 357
+			},
+			"categories": [{
+				"id": "4bf58dd8d48988d1e0931735",
+				"name": "Coffee Shop",
+				"pluralName": "Coffee Shops",
+				"shortName": "Coffee Shop",
+				"icon": {
+					"prefix": "https:\/\/ss3.4sqi.net\/img\/categories_v2\/food\/coffeeshop_",
+					"suffix": ".png"
+				}
+			}, {
+				"id": "4d4b7105d754a06374d81259",
+				"name": "Food",
+				"pluralName": "Food",
+				"shortName": "Food",
+				"icon": {
+					"prefix": "https:\/\/ss3.4sqi.net\/img\/categories_v2\/food\/default_",
+					"suffix": ".png"
+				}
+			}],
+			"hasPerk": false
+		}, {
+			"id": "57e95a82498e0a3995a43e90",
+			"name": "Anchorhead Coffee Co",
+			"location": {
+				"address": "1600 7th Ave Ste 105",
+				"crossStreet": "Olive Way",
+				"city": "Seattle",
+				"state": "WA",
+				"postalCode": "98101",
+				"country": "US",
+				"lat": 47.61343288864932,
+				"lng": -122.33468772309125,
+				"distance": 828
+			},
+			"categories": [{
+				"id": "4bf58dd8d48988d1e0931735",
+				"name": "Coffee Shop",
+				"pluralName": "Coffee Shops",
+				"shortName": "Coffee Shop",
+				"icon": {
+					"prefix": "https:\/\/ss3.4sqi.net\/img\/categories_v2\/food\/coffeeshop_",
+					"suffix": ".png"
+				}
+			}, {
+				"id": "4bf58dd8d48988d16d941735",
+				"name": "Café",
+				"pluralName": "Cafés",
+				"shortName": "Café",
+				"icon": {
+					"prefix": "https:\/\/ss3.4sqi.net\/img\/categories_v2\/food\/cafe_",
+					"suffix": ".png"
+				}
+			}, {
+				"id": "4d4b7105d754a06374d81259",
+				"name": "Food",
+				"pluralName": "Food",
+				"shortName": "Food",
+				"icon": {
+					"prefix": "https:\/\/ss3.4sqi.net\/img\/categories_v2\/food\/default_",
+					"suffix": ".png"
+				}
+			}],
+			"hasPerk": false
+		}]
+	}
+}

@@ -65,7 +65,7 @@ class SearchFragment : Fragment(),
 
         (activity as AppCompatActivity).supportActionBar?.show()
 
-        binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+        binding.resultsSearchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                 binding.typeaheadResultsList.visibility = View.GONE
                 searchViewModel.getPlaces(query)
@@ -132,7 +132,7 @@ class SearchFragment : Fragment(),
 
     override fun onSuggestionClicked(clickedSuggestion: String) {
         searchViewModel.lastQuery = clickedSuggestion
-        binding.searchBar.setQuery(clickedSuggestion, true)
+        binding.resultsSearchBar.setQuery(clickedSuggestion, true)
         binding.typeaheadResultsList.visibility = View.GONE
     }
 
