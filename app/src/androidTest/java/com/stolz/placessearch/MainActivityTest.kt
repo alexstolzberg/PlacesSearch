@@ -37,7 +37,6 @@ class MainActivityTest {
         mockWebServer.url("/")
     }
 
-
     @After
     fun shutdownMockServer() {
         mockWebServer.shutdown()
@@ -59,14 +58,14 @@ class MainActivityTest {
         onView(withId(R.id.results_search_bar)).check(matches(isDisplayed()))
         onView(isAssignableFrom(AutoCompleteTextView::class.java)).perform(
             typeText("cof"))
-        SystemClock.sleep(4000)
+        SystemClock.sleep(4000) // TODO: Remove this when MockWebServer implemented
         onView(withId(R.id.typeahead_results_list)).check(matches(isDisplayed()))
 
         onView(isAssignableFrom(AutoCompleteTextView::class.java)).perform(
             typeText("fee"),
             pressImeActionButton()
         )
-        SystemClock.sleep(4000)
+        SystemClock.sleep(4000) // TODO: Remove this when MockWebServer implemented
         onView(withId(R.id.typeahead_results_list)).check(matches(not(isDisplayed())))
         onView(withId(R.id.search_results_list)).check(matches(isDisplayed()))
     }
