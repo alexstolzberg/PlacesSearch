@@ -1,0 +1,60 @@
+Index: app/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>apply plugin: 'com.android.application'\n\napply plugin: 'kotlin-android'\n\napply plugin: 'kotlin-kapt'\n\napply plugin: 'kotlin-android-extensions'\n\napply plugin: \"androidx.navigation.safeargs.kotlin\"\n\ndef apikeyPropertiesFile = rootProject.file(\"apikey.properties\")\ndef apikeyProperties = new Properties()\napikeyProperties.load(new FileInputStream(apikeyPropertiesFile))\n\nandroid {\n    compileSdkVersion 28\n    dataBinding { enabled = true }\n    defaultConfig {\n        applicationId \"com.stolz.placessearch\"\n        minSdkVersion 23\n        targetSdkVersion 28\n        versionCode 1\n        versionName \"1.0\"\n        testInstrumentationRunner \"androidx.test.runner.AndroidJUnitRunner\"\n\n        buildConfigField(\"String\", \"FOURSQUARE_CLIENT_ID\", apikeyProperties['FOURSQUARE_CLIENT_ID'])\n        buildConfigField(\"String\", \"FOURSQUARE_CLIENT_SECRET\", apikeyProperties['FOURSQUARE_CLIENT_SECRET'])\n        buildConfigField(\"String\", \"GOOGLE_MAPS_API_KEY\", apikeyProperties['GOOGLE_MAPS_API_KEY'])\n    }\n\n    kapt {\n        generateStubs = true\n    }\n\n    buildTypes {\n        release {\n            minifyEnabled false\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'\n        }\n    }\n\n    compileOptions {\n        sourceCompatibility JavaVersion.VERSION_1_8\n        targetCompatibility JavaVersion.VERSION_1_8\n    }\n}\n\ndependencies {\n    implementation fileTree(dir: 'libs', include: ['*.jar'])\n\n    // Kotlin\n    implementation \"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version\"\n    implementation \"org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1\"\n    implementation \"org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1\"\n\n    // Android\n    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'\n    implementation \"androidx.recyclerview:recyclerview:1.1.0\"\n    implementation \"android.arch.lifecycle:extensions:1.1.1\"\n    kapt \"android.arch.lifecycle:compiler:1.1.0\"\n\n    // Core\n    implementation \"androidx.core:core:1.1.0\"\n\n    implementation 'androidx.appcompat:appcompat:1.1.0'\n    implementation 'androidx.core:core-ktx:1.1.0'\n\n    // Material Design\n    implementation 'com.google.android.material:material:1.0.0'\n\n    // Navigation\n    implementation \"androidx.navigation:navigation-fragment-ktx:2.1.0\"\n    implementation \"androidx.navigation:navigation-ui-ktx:2.1.0\"\n\n    // Room\n    implementation \"android.arch.persistence.room:runtime:1.1.1\"\n    kapt \"android.arch.persistence.room:compiler:1.1.1\"\n\n    // Retrofit\n    implementation \"com.squareup.retrofit2:retrofit:2.7.0\"\n    implementation \"com.squareup.retrofit2:converter-scalars:2.7.0\"\n    implementation \"com.squareup.retrofit2:converter-moshi:2.7.0\"\n    implementation \"com.squareup.okhttp3:okhttp:4.2.2\"\n    implementation \"com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2\"\n\n    // Moshi\n    implementation \"com.squareup.moshi:moshi:1.8.0\"\n    implementation \"com.squareup.moshi:moshi-kotlin:1.8.0\"\n\n    // Glide\n    implementation \"com.github.bumptech.glide:glide:4.8.0\"\n\n    // Google Maps\n    implementation 'com.google.android.gms:play-services-maps:17.0.0'\n\n    // Dagger\n    implementation 'com.google.dagger:dagger-android:2.16'\n    implementation 'com.google.dagger:dagger-android-support:2.16'\n    kapt 'com.google.dagger:dagger-android-processor:2.16'\n    kapt 'com.google.dagger:dagger-compiler:2.16'\n\n    implementation 'androidx.legacy:legacy-support-v4:1.0.0'\n    testImplementation 'junit:junit:4.12'\n    androidTestImplementation 'androidx.test.ext:junit:1.1.1'\n    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'\n    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'\n    implementation 'com.google.android.gms:play-services-maps:17.0.0'\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/build.gradle	(revision c0f7d3d05cbb6701434f4e8005a462a26f6d98ba)
++++ app/build.gradle	(date 1576963288000)
+@@ -54,20 +54,22 @@
+     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.1.1"
+ 
+     // Android
+-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+-    implementation "androidx.recyclerview:recyclerview:1.1.0"
+-    implementation "android.arch.lifecycle:extensions:1.1.1"
+-    kapt "android.arch.lifecycle:compiler:1.1.0"
+-
+-    // Core
+     implementation "androidx.core:core:1.1.0"
+-
+     implementation 'androidx.appcompat:appcompat:1.1.0'
+     implementation 'androidx.core:core-ktx:1.1.0'
++    implementation "android.arch.lifecycle:extensions:1.1.1"
++    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
++    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+ 
+-    // Material Design
++    // Material
+     implementation 'com.google.android.material:material:1.0.0'
+ 
++    // Constraint Layout
++    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
++    implementation "androidx.recyclerview:recyclerview:1.1.0"
++    //noinspection LifecycleAnnotationProcessorWithJava8
++    kapt "android.arch.lifecycle:compiler:1.1.1"
++
+     // Navigation
+     implementation "androidx.navigation:navigation-fragment-ktx:2.1.0"
+     implementation "androidx.navigation:navigation-ui-ktx:2.1.0"
+@@ -94,15 +96,12 @@
+     implementation 'com.google.android.gms:play-services-maps:17.0.0'
+ 
+     // Dagger
+-    implementation 'com.google.dagger:dagger-android:2.16'
+-    implementation 'com.google.dagger:dagger-android-support:2.16'
+-    kapt 'com.google.dagger:dagger-android-processor:2.16'
+-    kapt 'com.google.dagger:dagger-compiler:2.16'
++    implementation 'com.google.dagger:dagger-android:2.25.3'
++    implementation 'com.google.dagger:dagger-android-support:2.25.3'
++    kapt 'com.google.dagger:dagger-android-processor:2.25.3'
++    kapt 'com.google.dagger:dagger-compiler:2.25.3'
+ 
+-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+     testImplementation 'junit:junit:4.12'
+     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+-    implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
+-    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+ }

@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.stolz.placessearch.R
 import com.stolz.placessearch.databinding.FragmentDetailBinding
+import com.stolz.placessearch.model.Place
 import com.stolz.placessearch.model.places.Venue
 import com.stolz.placessearch.util.TELEPHONE_PREFIX
 import com.stolz.placessearch.util.Utils
@@ -44,18 +45,43 @@ class DetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.fragment_detail, container, false
+            inflater, R.layout.fragment_detail, container, false
         )
         binding.lifecycleOwner = this
         binding.viewModel = detailViewModel
 
+        // Hide action bar on this fragment
         (activity as AppCompatActivity).supportActionBar?.hide()
 
+        // Retrieve the place information that was passed in
         val args = arguments ?: return null
         val safeArgs = DetailFragmentArgs.fromBundle(args)
         val place = safeArgs.place
 
+        initUi(place)
+
+        // Create observer to add additional venue contact information when it is received
+        detailViewModel.venueInformation.observe(this, Observer {
+            if (it != null) {
+                addAdditionalContactInfo(it)
+            }
+        })
+
+        // Create observer to update static map image view when it is received
+        detailViewModel.staticMap.observe(this, Observer {
+            binding.staticMapImage.setImageBitmap(it)
+        })
+
+        // Retrieve static Google Map
+        detailViewModel.getStaticMap(place)
+
+        // Request additional venue information to populate more detailed contact info
+        detailViewModel.getVenueInformation(place.id)
+
+        return binding.root
+    }
+
+    private fun initUi(place: Place) {
         binding.contentDetails.name.text = place.name
         binding.contentDetails.category.text = place.category
         val distanceToCenterText = place.distanceToCenter.toString() + " miles to center"
@@ -69,24 +95,14 @@ class DetailFragment : Fragment() {
             binding.detailFab.setImageResource(if (place.isFavorite) R.drawable.ic_star_filled_white else R.drawable.ic_star_empty_white)
             detailViewModel.updateFavoriteForPlace(place)
         }
-
-        detailViewModel.venueInformation.observe(this, Observer {
-            if (it != null) {
-                updateContactInfo(it)
-            }
-        })
-
-        detailViewModel.staticMap.observe(this, Observer {
-            binding.staticMapImage.setImageBitmap(it)
-        })
-
-        detailViewModel.getStaticMap(place)
-        detailViewModel.getVenueInformation(place.id)
-
-        return binding.root
     }
 
-    private fun updateContactInfo(venue: Venue) {
+    /**
+     * Adds additional contact info to a venue if it has that information
+     *
+     * @param venue An object containing more detailed info about a specific place
+     */
+    private fun addAdditionalContactInfo(venue: Venue) {
         venue.contact?.let { contactInfo ->
             if (contactInfo.phone != null && contactInfo.phone.isNotEmpty()) {
                 binding.contentDetails.phone.text = Utils.formatPhoneNumber(contactInfo.phone)
