@@ -18,13 +18,19 @@ import com.google.android.material.snackbar.Snackbar
 import com.stolz.placessearch.R
 import com.stolz.placessearch.databinding.FragmentSearchBinding
 import com.stolz.placessearch.model.Place
+import com.stolz.placessearch.search.adapter.PlaceClickedListener
+import com.stolz.placessearch.search.adapter.SearchResultsAdapter
+import com.stolz.placessearch.search.adapter.TypeAheadSuggestionClickedListener
+import com.stolz.placessearch.search.adapter.TypeaheadResultsAdapter
 import com.stolz.placessearch.util.Utils
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 private val TAG = SearchFragment::class.java.simpleName
 
-class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClickedListener {
+class SearchFragment : Fragment(),
+    TypeAheadSuggestionClickedListener,
+    PlaceClickedListener {
 
     @Inject
     internal lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -69,7 +75,8 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClic
             }
         })
 
-        binding.typeaheadResultsList.adapter = TypeaheadResultsAdapter(this)
+        binding.typeaheadResultsList.adapter =
+            TypeaheadResultsAdapter(this)
         binding.typeaheadResultsList.addItemDecoration(
             DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
         )
@@ -86,7 +93,8 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClic
         })
 
 
-        binding.searchResultsList.adapter = SearchResultsAdapter(this)
+        binding.searchResultsList.adapter =
+            SearchResultsAdapter(this)
         searchViewModel.places.observe(this, Observer { placeResults ->
             if (placeResults.isEmpty()) {
                 binding.searchResultsList.visibility = View.GONE
@@ -119,7 +127,7 @@ class SearchFragment : Fragment(), TypeAheadSuggestionClickedListener, PlaceClic
     }
 
     override fun onSuggestionClicked(clickedSuggestion: String) {
-        searchViewModel.updateQuery(clickedSuggestion)
+        searchViewModel.lastQuery = clickedSuggestion
         binding.searchBar.setQuery(clickedSuggestion, true)
         binding.typeaheadResultsList.visibility = View.GONE
     }

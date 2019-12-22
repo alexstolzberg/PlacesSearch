@@ -1,4 +1,4 @@
-package com.stolz.placessearch.search
+package com.stolz.placessearch.search.adapter
 
 /**
  * This callback alerts the caller that a type ahead suggestion was selected

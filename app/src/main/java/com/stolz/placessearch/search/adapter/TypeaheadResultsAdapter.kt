@@ -1,4 +1,4 @@
-package com.stolz.placessearch.search
+package com.stolz.placessearch.search.adapter
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,7 +14,9 @@ import com.stolz.placessearch.R
 private val TAG = TypeaheadResultsAdapter::class.java.simpleName
 
 class TypeaheadResultsAdapter(private val itemClickedListener: TypeAheadSuggestionClickedListener) :
-    ListAdapter<String, TypeaheadResultsAdapter.ViewHolder>(DiffCallback) {
+    ListAdapter<String, TypeaheadResultsAdapter.ViewHolder>(
+        DiffCallback
+    ) {
 
     companion object DiffCallback : DiffUtil.ItemCallback<String>() {
         override fun areItemsTheSame(oldItem: String, newItem: String): Boolean {

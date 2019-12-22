@@ -1,4 +1,4 @@
-package com.stolz.placessearch.search
+package com.stolz.placessearch.search.adapter
 
 import com.stolz.placessearch.model.Place
 
