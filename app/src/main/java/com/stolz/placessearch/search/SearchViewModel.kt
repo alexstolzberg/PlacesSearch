@@ -12,6 +12,11 @@ import javax.inject.Inject
 
 private val TAG = SearchViewModel::class.java.simpleName
 
+/**
+ * This class stores the relevant data for the SearchFragment as LiveData and handles the retrieval
+ * of typeahead suggestions and the places matching the query by leveraging the SearchRepository.
+ * It also has logic for updating the isFavorite status for a place in the results list.
+ */
 class SearchViewModel @Inject constructor(
     private val favoritesDatabase: PlaceDao,
     private val searchRepository: SearchRepository

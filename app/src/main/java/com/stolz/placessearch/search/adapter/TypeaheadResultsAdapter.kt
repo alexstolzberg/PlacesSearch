@@ -13,6 +13,10 @@ import com.stolz.placessearch.R
 
 private val TAG = TypeaheadResultsAdapter::class.java.simpleName
 
+/**
+ * This class creates and binds the views that are inserted into the RecyclerView that contains all
+ * of the typeahead suggestions returned by the Foursquare API.
+ */
 class TypeaheadResultsAdapter(private val itemClickedListener: TypeAheadSuggestionClickedListener) :
     ListAdapter<String, TypeaheadResultsAdapter.ViewHolder>(
         DiffCallback

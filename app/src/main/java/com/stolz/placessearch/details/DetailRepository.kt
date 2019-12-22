@@ -20,6 +20,10 @@ import javax.inject.Inject
 
 private val TAG = DetailRepository::class.java.simpleName
 
+/**
+ * This class handles all of the calls to the Foursquare and Google Maps APIs and returns the
+ * information to the DetailViewModel.
+ */
 class DetailRepository @Inject constructor(
     private val foursquareApiService: FoursquareApiService,
     private val googleMapsApiService: GoogleMapsApiService

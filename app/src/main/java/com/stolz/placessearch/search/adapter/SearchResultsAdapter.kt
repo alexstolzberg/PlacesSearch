@@ -17,6 +17,10 @@ import com.stolz.placessearch.model.Place
 
 private val TAG = SearchResultsAdapter::class.java.simpleName
 
+/**
+ * This class creates and binds the views that are inserted into the RecyclerView that contains all
+ * of the places returned by the Foursquare API.
+ */
 class SearchResultsAdapter(private val listener: PlaceClickedListener) :
     ListAdapter<Place, SearchResultsAdapter.ViewHolder>(DiffCallback) {
 

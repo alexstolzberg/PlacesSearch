@@ -11,6 +11,11 @@ import com.stolz.placessearch.model.places.Venue
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
+/**
+ * This class stores the relevant data for the DetailFragment as LiveData and handles the retrieval
+ * of venue information and the static Google Map by leveraging the DetailRepository. It also has
+ * logic for updating the isFavorite status for the current place.
+ */
 class DetailViewModel @Inject constructor(
     private val context: Context,
     private val favoritesDatabase: PlaceDao,

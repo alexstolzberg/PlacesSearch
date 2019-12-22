@@ -23,6 +23,10 @@ import com.stolz.placessearch.util.Utils
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
+/**
+ * This class handles all of the view related logic for the detail screen. It observes various data
+ * from the DetailViewModel and updates the UI when new data arrives.
+ */
 class DetailFragment : Fragment() {
 
     @Inject

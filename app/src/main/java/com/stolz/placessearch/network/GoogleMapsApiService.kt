@@ -7,7 +7,9 @@ import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-
+/**
+ * This class handles all of the Google Maps API calls
+ */
 interface GoogleMapsApiService {
 
     @GET("staticmap")

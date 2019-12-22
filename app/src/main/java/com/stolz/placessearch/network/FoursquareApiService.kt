@@ -8,6 +8,9 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
+/**
+ * This class handles all of the Foursquare API calls
+ */
 interface FoursquareApiService {
 
     @GET("venues/suggestcompletion")

@@ -14,6 +14,10 @@ import javax.inject.Inject
 
 private val TAG = SearchRepository::class.java.simpleName
 
+/**
+ * This class handles all of the calls to the Foursquare API and returns the
+ * information to the SearchViewModel.
+ */
 class SearchRepository @Inject constructor(
     private val foursquareApiService: FoursquareApiService,
     private val favoritesDatabase: PlaceDao

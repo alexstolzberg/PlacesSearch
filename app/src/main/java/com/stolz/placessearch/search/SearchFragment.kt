@@ -28,6 +28,10 @@ import javax.inject.Inject
 
 private val TAG = SearchFragment::class.java.simpleName
 
+/**
+ * This class handles all of the view related logic for the search screen. It observes various data
+ * from the SearchViewModel and updates the UI when new data arrives.
+ */
 class SearchFragment : Fragment(),
     TypeAheadSuggestionClickedListener,
     PlaceClickedListener {
