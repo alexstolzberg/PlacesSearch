@@ -7,6 +7,7 @@ This app is intended to allow users to search for venues in and around their cit
 In order to run this application, you will need to have a Foursquare API key as well as a Google Maps key. I have left mine in the project for now, but I plan to invalidate them soon, so you will need to create your own. To create your Foursquare and Google accounts please follow the links below:
 
  [Create a Foursquare account](https://developer.foursquare.com/places-api)
+ 
  [Obtain a Google Maps key](https://developers.google.com/maps/documentation/maps-static/get-api-key)
 
 These keys are currently located in the `app_config.xml` file. Once these keys are in place you can run the app from Android Studio and the app should work as expected. Please note you will need internet connection to receive search results, map images, etc.
