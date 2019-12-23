@@ -62,7 +62,7 @@ These keys are currently located in the `app_config.xml` file. Once these keys a
     * Android API --  Displaying a full screen map view with markers
 
 ## Issues Encountered
-* I experienced issues when attempting to test my ViewModel and Repository classes because I was trying to use the inline mocks library from Mockito and for some reason the mocks for some of my classes were not respecting my when calls to mock methods of those classes. I believe that if I spent more time on it I'd be able to figure these out.
+* I experienced issues when attempting to test my ViewModel classes because I was trying to use the inline mocks library from Mockito and for some reason the mocks for some of my classes were not respecting my when calls to mock methods of those classes. I believe that if I spent more time on it I'd be able to figure these out.
 * The Navigation component simplifies certain things about fragment transitions and navigstion states but it does obscure a lot of the functionality which made it hard to tell what was happening a lot of the times, specifically with the ActionBar and back button navigation. I think there are definitely tradeoffs to using this library and writing the transition logic manually.
 
 ## Roadmap/Future Improvements
