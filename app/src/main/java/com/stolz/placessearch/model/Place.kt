@@ -16,6 +16,7 @@ class Place(
     val iconUrl: String? = "",
     var isFavorite: Boolean = false
 ) : Parcelable {
+
     companion object {
         @JvmStatic
         fun toPlaceEntity(place: Place): PlaceEntity {
@@ -29,5 +30,18 @@ class Place(
             placeEntity.isFavorite = place.isFavorite
             return placeEntity
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other == null) {
+            return false
+        }
+
+        val otherPlace = other as Place
+        return this.id == otherPlace.id && this.name == otherPlace.name
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode() + name.hashCode()
     }
 }

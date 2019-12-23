@@ -62,7 +62,7 @@ class SearchRepository @Inject constructor(
      * @param venues The model object to extract results from
      * @return A Set of place results -- a Set is used to filter out duplicates automatically
      */
-    private fun extractPlacesFromVenues(venues: List<Venue>): Set<Place> {
+    fun extractPlacesFromVenues(venues: List<Venue>): Set<Place> {
         val places = HashSet<Place>()
         for (venue in venues) {
             // Check the database to see if the current place has already been favorited
@@ -103,6 +103,7 @@ class SearchRepository @Inject constructor(
                 iconUrl = iconUrl,
                 isFavorite = isFavorite
             )
+
             places.add(p)
         }
 
