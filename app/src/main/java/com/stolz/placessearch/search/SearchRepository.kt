@@ -9,6 +9,7 @@ import com.stolz.placessearch.network.FoursquareApiService
 import com.stolz.placessearch.util.NUM_METERS_PER_MILE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import retrofit2.await
 import java.text.DecimalFormat
 import javax.inject.Inject
 

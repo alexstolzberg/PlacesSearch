@@ -1,21 +1,18 @@
 package com.stolz.placessearch.details
 
-import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.util.Log
 import com.stolz.placessearch.model.Place
 import com.stolz.placessearch.model.places.Venue
 import com.stolz.placessearch.network.FoursquareApiService
 import com.stolz.placessearch.network.GoogleMapsApiService
+import com.stolz.placessearch.util.BitmapUtils
 import com.stolz.placessearch.util.SEATTLE_LATITUDE
 import com.stolz.placessearch.util.SEATTLE_LONGITUDE
 import com.stolz.placessearch.util.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.ResponseBody
 import retrofit2.await
-import java.io.BufferedInputStream
 import javax.inject.Inject
 
 private val TAG = DetailRepository::class.java.simpleName
@@ -26,10 +23,13 @@ private val TAG = DetailRepository::class.java.simpleName
  */
 class DetailRepository @Inject constructor(
     private val foursquareApiService: FoursquareApiService,
-    private val googleMapsApiService: GoogleMapsApiService
+    private val googleMapsApiService: GoogleMapsApiService,
+    private val bitmapUtils: BitmapUtils
 ) {
 
-    suspend fun fetchStaticMap(context: Context, place: Place): Bitmap? {
+    suspend fun fetchStaticMap(
+        place: Place,
+        dimensions: String = ""): Bitmap? {
         val centerMarkerString = Utils.generateStaticMarkerQueryParam(
             SEATTLE_LATITUDE,
             SEATTLE_LONGITUDE,
@@ -47,12 +47,12 @@ class DetailRepository @Inject constructor(
                     centerMarker = centerMarkerString,
                     placeMarker = placeMarkerString,
                     zoom = Utils.generateZoomLevel(place.distanceToCenter),
-                    size = Utils.generateStaticMapDimensions(context.resources)
+                    size = dimensions
                 )
             try {
                 val result = staticMapDeferred.await()
                 Log.v(TAG, "Static map generated successfully")
-                createBitmap(result)
+                bitmapUtils.createBitmap(result)
             } catch (t: Throwable) {
                 Log.e(TAG, "Static map generation failed - ${t.message}")
                 null
@@ -73,11 +73,5 @@ class DetailRepository @Inject constructor(
                 null
             }
         }
-    }
-
-    private fun createBitmap(responseBody: ResponseBody): Bitmap {
-        val inputStream = responseBody.byteStream()
-        val bis = BufferedInputStream(inputStream)
-        return BitmapFactory.decodeStream(bis)
     }
 }

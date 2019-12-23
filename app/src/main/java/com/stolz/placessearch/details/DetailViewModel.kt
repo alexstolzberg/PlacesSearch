@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.stolz.placessearch.database.PlaceDao
 import com.stolz.placessearch.model.Place
 import com.stolz.placessearch.model.places.Venue
+import com.stolz.placessearch.util.Utils
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
@@ -37,10 +38,10 @@ class DetailViewModel @Inject constructor(
 
     fun getStaticMap(place: Place) {
         detailsScope.launch {
-            val bitmap = detailRepository.fetchStaticMap(context, place)
-            if (bitmap != null) {
-                _staticMap.value = bitmap
-            }
+            val bitmap = detailRepository.fetchStaticMap(place, Utils.generateStaticMapDimensions(context.resources))
+                if (bitmap != null) {
+                    _staticMap.value = bitmap
+                }
         }
     }
 

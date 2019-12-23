@@ -1,0 +1,112 @@
+{
+	"meta": {
+		"code": 200,
+		"requestId": "5b564e5bf594df1ee6823563"
+	},
+	"response": {
+		"venues": [{
+			"id": "49d3e558f964a520225c1fe3",
+			"name": "Cherry Street Coffee House",
+			"location": {
+				"address": "103 Cherry St",
+				"crossStreet": "at 1st Ave",
+				"lat": 47.6027673689831,
+				"lng": -122.33415096584942,
+				"labeledLatLngs": [{
+					"label": "display",
+					"lat": 47.6027673689831,
+					"lng": -122.33415096584942
+				}],
+				"distance": 411,
+				"postalCode": "98104",
+				"cc": "US",
+				"neighborhood": "Seattle Central Business District",
+				"city": "Seattle",
+				"state": "WA",
+				"country": "United States",
+				"formattedAddress": ["103 Cherry St (at 1st Ave)", "Seattle, WA 98104", "United States"]
+			},
+			"categories": [{
+				"id": "4bf58dd8d48988d1e0931735",
+				"name": "Coffee Shop",
+				"pluralName": "Coffee Shops",
+				"shortName": "Coffee Shop",
+				"icon": {
+					"prefix": "https:\/\/ss3.4sqi.net\/img\/categories_v2\/food\/coffeeshop_",
+					"suffix": ".png"
+				},
+				"primary": true
+			}],
+			"referralId": "v-1532382811",
+			"hasPerk": false
+		}, {
+			"id": "52d456c811d24128cdd7bc8b",
+			"name": "Storyville Coffee Company",
+			"location": {
+				"address": "1001 1st Ave",
+				"crossStreet": "at Madison St",
+				"lat": 47.60475923205166,
+				"lng": -122.33636210125788,
+				"labeledLatLngs": [{
+					"label": "display",
+					"lat": 47.60475923205166,
+					"lng": -122.33636210125788
+				}],
+				"distance": 357,
+				"postalCode": "98104",
+				"cc": "US",
+				"city": "Seattle",
+				"state": "WA",
+				"country": "United States",
+				"formattedAddress": ["1001 1st Ave (at Madison St)", "Seattle, WA 98104", "United States"]
+			},
+			"categories": [{
+				"id": "4bf58dd8d48988d1e0931735",
+				"name": "Coffee Shop",
+				"pluralName": "Coffee Shops",
+				"shortName": "Coffee Shop",
+				"icon": {
+					"prefix": "https:\/\/ss3.4sqi.net\/img\/categories_v2\/food\/coffeeshop_",
+					"suffix": ".png"
+				},
+				"primary": true
+			}],
+			"referralId": "v-1532382811",
+			"hasPerk": false
+		}, {
+			"id": "57e95a82498e0a3995a43e90",
+			"name": "Anchorhead Coffee Co",
+			"location": {
+				"address": "1600 7th Ave Ste 105",
+				"crossStreet": "Olive Way",
+				"lat": 47.613432868408346,
+				"lng": -122.334687716133,
+				"labeledLatLngs": [{
+					"label": "display",
+					"lat": 47.613432868408346,
+					"lng": -122.334687716133
+				}],
+				"distance": 828,
+				"postalCode": "98101",
+				"cc": "US",
+				"city": "Seattle",
+				"state": "WA",
+				"country": "United States",
+				"formattedAddress": ["1600 7th Ave Ste 105 (Olive Way)", "Seattle, WA 98101", "United States"]
+			},
+			"categories": [{
+				"id": "4bf58dd8d48988d1e0931735",
+				"name": "Coffee Shop",
+				"pluralName": "Coffee Shops",
+				"shortName": "Coffee Shop",
+				"icon": {
+					"prefix": "https:\/\/ss3.4sqi.net\/img\/categories_v2\/food\/coffeeshop_",
+					"suffix": ".png"
+				},
+				"primary": true
+			}],
+			"referralId": "v-1532382811",
+			"hasPerk": false
+		}]
+	}
+}
